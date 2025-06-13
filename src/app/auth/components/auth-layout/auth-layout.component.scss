@@ -1,0 +1,144 @@
+.auth-layout {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 20px;
+}
+
+.auth-container {
+  width: 100%;
+  max-width: 450px;
+  position: relative;
+  z-index: 2;
+}
+
+.auth-card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.15);
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.auth-header {
+  background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+  color: white;
+  padding: 40px 30px 30px;
+  text-align: center;
+
+  .brand-title {
+    font-size: 1.8rem;
+    font-weight: 700;
+    margin: 0 0 8px;
+    letter-spacing: -0.5px;
+  }
+
+  .brand-subtitle {
+    font-size: 0.95rem;
+    opacity: 0.9;
+    margin: 0;
+    font-weight: 400;
+  }
+}
+
+.auth-content {
+  padding: 40px 30px;
+}
+
+.auth-footer {
+  background: #f8f9fa;
+  padding: 20px 30px;
+  text-align: center;
+  border-top: 1px solid #e9ecef;
+
+  p {
+    margin: 0;
+    font-size: 0.85rem;
+    color: #6c757d;
+  }
+}
+
+.auth-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+}
+
+.auth-pattern {
+  width: 100%;
+  height: 100%;
+  background-image: 
+    radial-gradient(circle at 25% 25%, rgba(255, 255, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 75% 75%, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  background-size: 100px 100px;
+  animation: float 20s ease-in-out infinite;
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px) rotate(0deg); }
+  50% { transform: translateY(-20px) rotate(5deg); }
+}
+
+// Responsive design
+@media (max-width: 768px) {
+  .auth-layout {
+    padding: 15px;
+  }
+
+  .auth-container {
+    max-width: 100%;
+  }
+
+  .auth-header {
+    padding: 30px 25px 25px;
+
+    .brand-title {
+      font-size: 1.6rem;
+    }
+
+    .brand-subtitle {
+      font-size: 0.9rem;
+    }
+  }
+
+  .auth-content {
+    padding: 30px 25px;
+  }
+
+  .auth-footer {
+    padding: 18px 25px;
+
+    p {
+      font-size: 0.8rem;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .auth-layout {
+    padding: 10px;
+  }
+
+  .auth-header {
+    padding: 25px 20px;
+
+    .brand-title {
+      font-size: 1.4rem;
+    }
+  }
+
+  .auth-content {
+    padding: 25px 20px;
+  }
+
+  .auth-footer {
+    padding: 15px 20px;
+  }
+}
