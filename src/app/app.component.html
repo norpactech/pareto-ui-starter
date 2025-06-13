@@ -7,20 +7,35 @@
       <span></span>
     </div>
   </button>
+    <h1 class="logo">{{ title }}</h1>
   
-  <h1 class="logo">{{ title }}</h1>
-    <div class="header-actions">    <!-- User Profile Button -->
-    <button class="user-profile-btn mat-icon-button" 
-            (click)="openUserProfile()" 
-            matTooltip="User Profile"
-            *ngIf="currentUser">
-      <mat-icon class="user-icon">account_circle</mat-icon>
-    </button>
-    
-    <!-- Theme Toggle -->
-    <button class="theme-toggle mat-icon-button" (click)="toggleTheme()" [attr.aria-label]="isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'">
-      <mat-icon class="theme-icon">{{ isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
-    </button>
+  <div class="header-actions">
+    <!-- Authenticated User Actions -->
+    <ng-container *ngIf="isAuthenticated">
+      <!-- User Profile Button -->
+      <button class="user-profile-btn mat-icon-button" 
+              (click)="openUserProfile()" 
+              matTooltip="User Profile">
+        <mat-icon class="user-icon">account_circle</mat-icon>
+      </button>
+      
+      <!-- Theme Toggle -->
+      <button class="theme-toggle mat-icon-button" 
+              (click)="toggleTheme()" 
+              [attr.aria-label]="isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'">
+        <mat-icon class="theme-icon">{{ isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
+      </button>
+    </ng-container>    <!-- Unauthenticated User Actions -->
+    <ng-container *ngIf="!isAuthenticated">
+      <button class="auth-btn" routerLink="/auth/signin">
+        <mat-icon>login</mat-icon>
+        <span>Sign In</span>
+      </button>
+      <button class="auth-btn" routerLink="/auth/signup">
+        <mat-icon>person_add</mat-icon>
+        <span>Sign Up</span>
+      </button>
+    </ng-container>
   </div>
 </header>
 
@@ -34,44 +49,64 @@
     <button class="close-btn mat-icon-button" (click)="closeMenu()" aria-label="Close menu">
       <span class="close-icon material-icons">close</span>
     </button>
-  </div>
-  
-  <div class="menu-content">
+  </div>  <div class="menu-content">
     <div class="menu-list">
-      <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
-        <span class="menu-icon material-icons">dashboard</span>
-        <span class="menu-text">Dashboard</span>
+      <a routerLink="/" class="menu-item mat-list-item" (click)="closeMenu()">
+        <span class="menu-icon material-icons">home</span>
+        <span class="menu-text">Home</span>
       </a>
-      <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
-        <span class="menu-icon material-icons">person</span>
-        <span class="menu-text">Profile</span>
-      </a>
-      <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
-        <span class="menu-icon material-icons">settings</span>
-        <span class="menu-text">Settings</span>
-      </a>
-      <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
-        <span class="menu-icon material-icons">folder</span>
-        <span class="menu-text">Projects</span>
-      </a>      <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
-        <span class="menu-icon material-icons">group</span>
-        <span class="menu-text">Team</span>
-      </a>
-      <a routerLink="/users" class="menu-item mat-list-item" (click)="closeMenu()">
-        <span class="menu-icon material-icons">manage_accounts</span>
-        <span class="menu-text">User Management</span>
-      </a>
-      <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
-        <span class="menu-icon material-icons">analytics</span>
-        <span class="menu-text">Reports</span>
-      </a>
-      <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
-        <span class="menu-icon material-icons">help</span>
-        <span class="menu-text">Help</span>
-      </a>
+      
+      <!-- Authenticated User Menu Items -->
+      <ng-container *ngIf="isAuthenticated">
+        <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
+          <span class="menu-icon material-icons">dashboard</span>
+          <span class="menu-text">Dashboard</span>
+        </a>
+        <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
+          <span class="menu-icon material-icons">person</span>
+          <span class="menu-text">Profile</span>
+        </a>
+        <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
+          <span class="menu-icon material-icons">settings</span>
+          <span class="menu-text">Settings</span>
+        </a>
+        <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
+          <span class="menu-icon material-icons">folder</span>
+          <span class="menu-text">Projects</span>
+        </a>
+        <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
+          <span class="menu-icon material-icons">group</span>
+          <span class="menu-text">Team</span>
+        </a>
+        <a routerLink="/users" class="menu-item mat-list-item" (click)="closeMenu()">
+          <span class="menu-icon material-icons">manage_accounts</span>
+          <span class="menu-text">User Management</span>
+        </a>
+        <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
+          <span class="menu-icon material-icons">analytics</span>
+          <span class="menu-text">Reports</span>
+        </a>        <a routerLink="/help" class="menu-item mat-list-item" (click)="closeMenu()">
+          <span class="menu-icon material-icons">help</span>
+          <span class="menu-text">Help</span>
+        </a>
+      </ng-container>
+        <!-- Unauthenticated User Menu Items -->      <ng-container *ngIf="!isAuthenticated">
+        <a routerLink="/auth/signin" class="menu-item mat-list-item" (click)="closeMenu()">
+          <span class="menu-icon material-icons">login</span>
+          <span class="menu-text">Sign In</span>
+        </a>
+        <a routerLink="/auth/signup" class="menu-item mat-list-item" (click)="closeMenu()">
+          <span class="menu-icon material-icons">person_add</span>
+          <span class="menu-text">Sign Up</span>
+        </a>
+        <a routerLink="/help" class="menu-item mat-list-item" (click)="closeMenu()">
+          <span class="menu-icon material-icons">help</span>
+          <span class="menu-text">Help</span>
+        </a>
+      </ng-container>
     </div>
     
-    <div class="menu-footer">
+    <div class="menu-footer" *ngIf="isAuthenticated">
       <a href="#" class="menu-item mat-list-item logout" (click)="closeMenu()">
         <span class="menu-icon material-icons">logout</span>
         <span class="menu-text">Logout</span>
@@ -82,55 +117,5 @@
 
 <!-- Material Design Main content area -->
 <main class="main-content" [class.menu-open]="isMenuOpen">
-  <div class="content-container">
-    <div class="welcome-card mat-elevation-z2">
-      <div class="card-header">
-        <h1 class="welcome-title">Welcome to {{ title }}!</h1>
-        <p class="welcome-subtitle">Your modern Angular application with Material Design</p>
-      </div>
-      
-      <div class="card-content">
-        <div class="feature-grid">
-          <div class="feature-item mat-elevation-z1">
-            <div class="feature-icon material-icons">palette</div>
-            <h3>Material Design</h3>
-            <p>Beautiful, responsive UI components following Google's Material Design principles</p>
-          </div>
-          
-          <div class="feature-item mat-elevation-z1">
-            <div class="feature-icon material-icons">dark_mode</div>
-            <h3>Dark/Light Theme</h3>
-            <p>Seamless theme switching with custom green color palette</p>
-          </div>
-          
-          <div class="feature-item mat-elevation-z1">
-            <div class="feature-icon material-icons">responsive_layout</div>
-            <h3>Responsive Menu</h3>
-            <p>Adaptive hamburger menu that works perfectly on all device sizes</p>
-          </div>
-          
-          <div class="feature-item mat-elevation-z1">
-            <div class="feature-icon material-icons">security</div>
-            <h3>Authentication</h3>
-            <p>Complete authentication system with security guards and interceptors</p>
-          </div>
-          
-          <div class="feature-item mat-elevation-z1">
-            <div class="feature-icon material-icons">eco</div>
-            <h3>Green Theme</h3>
-            <p>Beautiful light and dark green theme variations for all components</p>
-          </div>
-          
-          <div class="feature-item mat-elevation-z1">
-            <div class="feature-icon material-icons">speed</div>
-            <h3>Performance</h3>
-            <p>Optimized for speed with Angular's latest features and best practices</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Router outlet for future pages -->
   <router-outlet></router-outlet>
 </main>

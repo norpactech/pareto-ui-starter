@@ -90,6 +90,82 @@
     }
 }
 
+// GitHub-style authentication buttons in header
+.auth-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 6px 16px;
+  border-radius: 6px;
+  border: 1px solid #d1d9e0;
+  background: #ffffff;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  color: #24292f;
+  margin-left: 8px;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  line-height: 20px;
+  position: relative;
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+    color: #24292f;
+  }
+
+  span {
+    white-space: nowrap;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Noto Sans", Helvetica, Arial, sans-serif;
+  }
+
+  &:hover {
+    background-color: #f3f4f6;
+    border-color: #d1d9e0;
+    text-decoration: none;
+    transition-duration: 0.1s;
+  }
+
+  &:active {
+    background-color: #e5e7ea;
+    border-color: #d1d9e0;
+    transform: none;
+  }
+
+  &:focus {
+    outline: 2px solid #0969da;
+    outline-offset: -2px;
+  }
+
+  // Dark theme styles
+  :host-context(.dark-theme) & {
+    background: #21262d;
+    border-color: #30363d;
+    color: #f0f6fc;
+
+    mat-icon {
+      color: #f0f6fc;
+    }
+
+    &:hover {
+      background-color: #30363d;
+      border-color: #8b949e;
+    }
+
+    &:active {
+      background-color: #21262d;
+      border-color: #8b949e;
+    }
+
+    &:focus {
+      outline-color: #58a6ff;
+    }
+  }
+}
+
 // Material Design Buttons
 .mat-icon-button {
   display: inline-flex;
@@ -400,7 +476,6 @@
     }
   }
 }
-
 // Main content styles
 .main-content {
   margin-top: var(--header-height);

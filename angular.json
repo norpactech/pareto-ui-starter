@@ -38,9 +38,20 @@
               "src/styles.scss"
             ],
             "scripts": []
-          },
-          "configurations": {
-            "production": {              "budgets": [
+          },          "configurations": {
+            "production": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.prod.ts"
+                }
+              ],
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": false,
+              "namedChunks": false,
+              "extractLicenses": true,
+              "budgets": [
                 {
                   "type": "initial",
                   "maximumWarning": "600kB",
@@ -51,8 +62,44 @@
                   "maximumWarning": "6kB",
                   "maximumError": "12kB"
                 }
+              ]
+            },
+            "dev": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.dev.ts"
+                }
               ],
-              "outputHashing": "all"
+              "optimization": true,
+              "outputHashing": "all",
+              "sourceMap": true,
+              "namedChunks": false,
+              "extractLicenses": false,
+              "budgets": [
+                {
+                  "type": "initial",
+                  "maximumWarning": "1MB",
+                  "maximumError": "2MB"
+                },
+                {
+                  "type": "anyComponentStyle",
+                  "maximumWarning": "8kB",
+                  "maximumError": "16kB"
+                }
+              ]
+            },            "local": {
+              "fileReplacements": [
+                {
+                  "replace": "src/environments/environment.ts",
+                  "with": "src/environments/environment.local.ts"
+                }
+              ],
+              "optimization": false,
+              "outputHashing": "none",
+              "sourceMap": true,
+              "namedChunks": true,
+              "extractLicenses": false
             },
             "development": {
               "optimization": false,
@@ -61,18 +108,23 @@
             }
           },
           "defaultConfiguration": "production"
-        },
-        "serve": {
+        },        "serve": {
           "builder": "@angular-devkit/build-angular:dev-server",
           "configurations": {
             "production": {
               "buildTarget": "pareto-ui:build:production"
             },
+            "dev": {
+              "buildTarget": "pareto-ui:build:dev"
+            },
+            "local": {
+              "buildTarget": "pareto-ui:build:local"
+            },
             "development": {
               "buildTarget": "pareto-ui:build:development"
             }
           },
-          "defaultConfiguration": "development"
+          "defaultConfiguration": "local"
         },
         "extract-i18n": {
           "builder": "@angular-devkit/build-angular:extract-i18n"

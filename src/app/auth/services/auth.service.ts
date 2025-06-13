@@ -3,6 +3,7 @@ import { HttpClient, HttpErrorResponse } from '@angular/common/http';
 import { BehaviorSubject, Observable, throwError, timer } from 'rxjs';
 import { map, catchError, tap, switchMap } from 'rxjs/operators';
 import { Router } from '@angular/router';
+import { environment } from '../../../environments/environment';
 import { 
   User, 
   SignInRequest, 
@@ -20,10 +21,12 @@ import {
   providedIn: 'root'
 })
 export class AuthService {
-  private readonly API_URL = 'http://localhost:3000/api/auth'; // Replace with your API URL
+  private readonly API_URL = environment.authUrl;
   private readonly TOKEN_KEY = 'access_token';
   private readonly REFRESH_TOKEN_KEY = 'refresh_token';
   private readonly USER_KEY = 'user';
+  private readonly TOKEN_REFRESH_BUFFER = environment.auth.tokenRefreshBuffer;
+  private readonly SESSION_TIMEOUT = environment.auth.sessionTimeout;
 
   // Auth state management
   private authStateSubject = new BehaviorSubject<AuthState>({

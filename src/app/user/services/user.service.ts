@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { delay, map } from 'rxjs/operators';
 import { User, CreateUserRequest, UpdateUserRequest } from '../../shared/models/user.models';
+import { EnvironmentService } from '../../shared/services/environment.service';
 
 @Injectable({
   providedIn: 'root'
@@ -43,12 +44,19 @@ export class UserService {
       updatedAt: new Date('2024-01-05')
     }
   ];
-
-  constructor() {
+  constructor(private environmentService: EnvironmentService) {
     // Initialize with mock data
     this.usersSubject.next([...this.mockUsers]);
     // Set current user (simulating logged-in user)
     this.currentUserSubject.next(this.mockUsers[0]);
+    
+    // Log environment info if debugging is enabled
+    if (this.environmentService.enableDebugInfo) {
+      this.environmentService.log('info', 'UserService initialized', {
+        environment: this.environmentService.environmentName,
+        apiUrl: this.environmentService.apiUrl
+      });
+    }
   }
 
   // Get current user
