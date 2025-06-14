@@ -13,7 +13,7 @@ export interface AuthUser {
   id: string;
   email: string;
   emailVerified: boolean;
-  attributes?: { [key: string]: any };
+  attributes?: Record<string, string | number | boolean>;
   groups?: string[];
   roles?: string[];
 }
@@ -22,7 +22,7 @@ export interface AuthUser {
 export interface SignUpRequest {
   email: string;
   password: string;
-  attributes?: { [key: string]: string };
+  attributes?: Record<string, string>;
 }
 
 // Sign up response interface
@@ -89,7 +89,7 @@ export interface OAuthConfig {
   redirectUri: string;
   responseType: string;
   scope: string[];
-  additionalParams?: { [key: string]: any };
+  additionalParams?: Record<string, string | number | boolean>;
 }
 
 // Main authentication provider interface
@@ -166,8 +166,8 @@ export class AuthError extends Error {
   constructor(
     public type: AuthErrorType,
     message: string,
-    public originalError?: any,
-    public metadata?: { [key: string]: any }
+    public originalError?: Error | unknown,
+    public metadata?: Record<string, string | number | boolean>
   ) {
     super(message);
     this.name = 'AuthError';
@@ -176,14 +176,14 @@ export class AuthError extends Error {
 
 // Provider factory interface for creating provider instances
 export interface IAuthProviderFactory {
-  createProvider(config: any): IAuthProvider;
+  createProvider(config: Record<string, unknown>): IAuthProvider;
   getSupportedProviders(): string[];
 }
 
 // Provider configuration interface
 export interface AuthProviderConfig {
   type: 'cognito' | 'firebase' | 'auth0' | 'okta' | 'custom';
-  config: any; // Provider-specific configuration
+  config: Record<string, unknown>; // Provider-specific configuration
   enabled: boolean;
   primary?: boolean; // Whether this is the primary provider
 }

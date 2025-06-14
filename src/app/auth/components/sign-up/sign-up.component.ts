@@ -236,7 +236,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
         return false;
     }
   }private getFieldDisplayName(fieldName: string): string {
-    const displayNames: { [key: string]: string } = {
+    const displayNames: Record<string, string> = {
       email: 'Email',
       password: 'Password',
       confirmPassword: 'Confirm password',

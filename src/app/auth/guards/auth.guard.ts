@@ -67,14 +67,13 @@ export class RoleGuard implements CanActivate {
           localStorage.setItem('redirectUrl', state.url);
           this.router.navigate(['/auth/signin']);
           return false;
-        }
-
-        // Note: Cognito roles would be checked from user attributes
+        }        // Note: Cognito roles would be checked from user attributes
         // For now, we'll allow all authenticated users
         // You can implement role checking from user.attributes if needed
         if (requiredRole) {
-          const userRoles = authState.user?.attributes?.['custom:roles'] || '';
-          if (!userRoles.includes(requiredRole)) {
+          const userRoles = authState.user?.attributes?.['custom:roles'];
+          const rolesString = typeof userRoles === 'string' ? userRoles : '';
+          if (!rolesString.includes(requiredRole)) {
             this.router.navigate(['/unauthorized']);
             return false;
           }

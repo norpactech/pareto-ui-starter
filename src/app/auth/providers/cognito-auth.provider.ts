@@ -263,7 +263,7 @@ export class CognitoAuthProvider extends BaseAuthProvider {  private cognitoClie
 
     return from(this.cognitoClient.send(command)).pipe(
       map(response => {
-        const attributes: { [key: string]: any } = {};
+        const attributes: Record<string, any> = {};
         response.UserAttributes?.forEach(attr => {
           if (attr.Name && attr.Value) {
             attributes[attr.Name] = attr.Value;

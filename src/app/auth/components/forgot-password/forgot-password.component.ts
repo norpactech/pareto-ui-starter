@@ -249,7 +249,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   }
 
   private getFieldDisplayName(fieldName: string): string {
-    const displayNames: { [key: string]: string } = {
+    const displayNames: Record<string, string> = {
       email: 'Email',
       code: 'Verification code',
       newPassword: 'New password',

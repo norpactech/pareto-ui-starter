@@ -46,7 +46,7 @@
 </header>
 
 <!-- Overlay for mobile menu -->
-<div class="overlay" [class.active]="isMenuOpen" (click)="closeMenuOnOverlay()"></div>
+<div class="overlay" [class.active]="isMenuOpen" (click)="closeMenuOnOverlay()" (keydown.enter)="closeMenuOnOverlay()" (keydown.space)="closeMenuOnOverlay()" tabindex="0" role="button" aria-label="Close menu overlay"></div>
 
 <!-- Material Design Side navigation menu -->
 <nav class="side-menu mat-elevation-z8" [class.active]="isMenuOpen">
@@ -110,8 +110,7 @@
         </a>
       </ng-container>
     </div>
-      <div class="menu-footer" *ngIf="isAuthenticated">
-      <a class="menu-item mat-list-item logout" (click)="signOut()">
+      <div class="menu-footer" *ngIf="isAuthenticated">      <a class="menu-item mat-list-item logout" (click)="signOut()" (keydown.enter)="signOut()" (keydown.space)="signOut()" tabindex="0" role="button">
         <span class="menu-icon material-icons">logout</span>
         <span class="menu-text">Logout</span>
       </a>

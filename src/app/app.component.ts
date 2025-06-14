@@ -3,19 +3,16 @@
  * Licensed under the MIT License.
  */
 
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { RouterOutlet, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { MatDialog } from '@angular/material/dialog';
-import { MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThemeService } from './shared/services/theme.service';
-import { UserService } from './user/services/user.service';
-import { CognitoAuthService, CognitoAuthState } from './auth/services/cognito-auth.service';
+import { CognitoAuthService, CognitoAuthState, CognitoUser } from './auth/services/cognito-auth.service';
 import { UserProfileComponent } from './user/components/user-profile/user-profile.component';
-import { User } from './shared/models/user.models';
 
 @Component({
   selector: 'app-root',
@@ -23,7 +20,12 @@ import { User } from './shared/models/user.models';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {  title = 'Pareto UI Starter';
+export class AppComponent implements OnInit {
+  private themeService = inject(ThemeService);
+  private cognitoAuth = inject(CognitoAuthService);
+  private dialog = inject(MatDialog);
+
+  title = 'Pareto UI Starter';
   isMenuOpen = false;
   isDarkTheme = false;
   authState: CognitoAuthState = {
@@ -40,16 +42,9 @@ export class AppComponent implements OnInit {  title = 'Pareto UI Starter';
     return this.authState.isAuthenticated;
   }
 
-  get currentUser(): any {
+  get currentUser(): CognitoUser | null {
     return this.authState.user;
-  }
-
-  constructor(
-    private themeService: ThemeService,
-    private userService: UserService,
-    private cognitoAuth: CognitoAuthService,
-    private dialog: MatDialog
-  ) {}ngOnInit(): void {
+  }ngOnInit(): void {
     // Subscribe to theme changes
     this.themeService.theme$.subscribe(theme => {
       this.isDarkTheme = theme === 'dark';

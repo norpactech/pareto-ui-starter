@@ -16,7 +16,6 @@ import {
   DeleteUserCommand,
   GlobalSignOutCommand,
   AuthFlowType,
-  ChallengeNameType,
   AttributeType
 } from '@aws-sdk/client-cognito-identity-provider';
 import { environment } from '../../../environments/environment';
@@ -30,7 +29,7 @@ export interface CognitoConfig {
 export interface CognitoUser {
   username: string;
   email: string;
-  attributes: { [key: string]: any };
+  attributes: Record<string, string | number | boolean>;
 }
 
 export interface CognitoAuthState {
@@ -100,12 +99,11 @@ export class CognitoAuthService {
   /**
    * Check current authentication state from localStorage and sessionStorage
    */
-  private checkAuthState(): void {
-    // Check both localStorage and sessionStorage for tokens
-    let accessToken = localStorage.getItem('cognito_access_token') || sessionStorage.getItem('cognito_access_token');
-    let idToken = localStorage.getItem('cognito_id_token') || sessionStorage.getItem('cognito_id_token');
-    let refreshToken = localStorage.getItem('cognito_refresh_token') || sessionStorage.getItem('cognito_refresh_token');
-    let userData = localStorage.getItem('cognito_user') || sessionStorage.getItem('cognito_user');
+  private checkAuthState(): void {    // Check both localStorage and sessionStorage for tokens
+    const accessToken = localStorage.getItem('cognito_access_token') || sessionStorage.getItem('cognito_access_token');
+    const idToken = localStorage.getItem('cognito_id_token') || sessionStorage.getItem('cognito_id_token');
+    const refreshToken = localStorage.getItem('cognito_refresh_token') || sessionStorage.getItem('cognito_refresh_token');
+    const userData = localStorage.getItem('cognito_user') || sessionStorage.getItem('cognito_user');
 
     if (accessToken && idToken && userData) {
       try {
@@ -138,7 +136,7 @@ export class CognitoAuthService {
   /**
    * Sign up a new user
    */
-  signUp(username: string, password: string, email: string, attributes: { [key: string]: string } = {}): Observable<SignUpResult> {
+  signUp(username: string, password: string, email: string, attributes: Record<string, string> = {}): Observable<SignUpResult> {
     this.updateAuthState({ loading: true, error: null });
 
     const userAttributes: AttributeType[] = [
@@ -205,11 +203,10 @@ export class CognitoAuthService {
       })
     );
   }
-
   /**
    * Resend confirmation code
    */
-  resendConfirmationCode(username: string): Observable<any> {
+  resendConfirmationCode(username: string): Observable<{CodeDeliveryDetails?: {Destination: string}}> {
     this.updateAuthState({ loading: true, error: null });
 
     const command = new ResendConfirmationCodeCommand({
@@ -221,6 +218,11 @@ export class CognitoAuthService {
       tap(() => {
         this.updateAuthState({ loading: false });
       }),
+      map(response => ({
+        CodeDeliveryDetails: response.CodeDeliveryDetails ? {
+          Destination: response.CodeDeliveryDetails.Destination || ''
+        } : undefined
+      })),
       catchError(error => {
         this.updateAuthState({ 
           loading: false, 
@@ -233,7 +235,7 @@ export class CognitoAuthService {
   /**
    * Sign in user
    */
-  signIn(username: string, password: string, rememberMe: boolean = false): Observable<any> {
+  signIn(username: string, password: string, rememberMe = false): Observable<void> {
     this.updateAuthState({ loading: true, error: null });
 
     const command = new InitiateAuthCommand({
@@ -243,9 +245,7 @@ export class CognitoAuthService {
         USERNAME: username,
         PASSWORD: password
       }
-    });
-
-    return from(this.cognitoClient.send(command)).pipe(
+    });    return from(this.cognitoClient.send(command)).pipe(
       tap(response => {
         if (response.ChallengeName) {
           // Handle challenges (MFA, NEW_PASSWORD_REQUIRED, etc.)
@@ -259,6 +259,7 @@ export class CognitoAuthService {
           this.handleSuccessfulAuth(username, authResult, rememberMe);
         }
       }),
+      map(() => void 0),
       catchError(error => {
         this.updateAuthState({ 
           loading: false, 
@@ -331,18 +332,17 @@ export class CognitoAuthService {
   /**
    * Forgot password
    */
-  forgotPassword(username: string): Observable<any> {
+  forgotPassword(username: string): Observable<void> {
     this.updateAuthState({ loading: true, error: null });
 
     const command = new ForgotPasswordCommand({
       ClientId: this.cognitoConfig.userPoolClientId,
       Username: username
-    });
-
-    return from(this.cognitoClient.send(command)).pipe(
+    });    return from(this.cognitoClient.send(command)).pipe(
       tap(() => {
         this.updateAuthState({ loading: false });
       }),
+      map(() => void 0),
       catchError(error => {
         this.updateAuthState({ 
           loading: false, 
@@ -438,7 +438,7 @@ export class CognitoAuthService {
   /**
    * Update user attributes
    */
-  updateUserAttributes(attributes: { [key: string]: string }): Observable<void> {
+  updateUserAttributes(attributes: Record<string, string>): Observable<void> {
     this.updateAuthState({ loading: true, error: null });
 
     const accessToken = this.authStateSubject.value.accessToken;
@@ -533,7 +533,7 @@ export class CognitoAuthService {
     // Get user information
     this.getCurrentUser().subscribe({
       next: (userResponse) => {
-        const userAttributes: { [key: string]: any } = {};
+        const userAttributes: Record<string, any> = {};
         userResponse.UserAttributes?.forEach((attr: AttributeType) => {
           if (attr.Name && attr.Value) {
             userAttributes[attr.Name] = attr.Value;
