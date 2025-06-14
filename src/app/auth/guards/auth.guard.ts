@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CanActivate, CanActivateChild, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
@@ -8,11 +8,8 @@ import { CognitoAuthService } from '../services/cognito-auth.service';
   providedIn: 'root'
 })
 export class AuthGuard implements CanActivate, CanActivateChild {
-
-  constructor(
-    private cognitoAuth: CognitoAuthService,
-    private router: Router
-  ) {}
+  private cognitoAuth = inject(CognitoAuthService);
+  private router = inject(Router);
 
   canActivate(
     route: ActivatedRouteSnapshot,
@@ -49,10 +46,8 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   providedIn: 'root'
 })
 export class RoleGuard implements CanActivate {
-  constructor(
-    private cognitoAuth: CognitoAuthService,
-    private router: Router
-  ) {}
+  private cognitoAuth = inject(CognitoAuthService);
+  private router = inject(Router);
 
   canActivate(
     route: ActivatedRouteSnapshot,
@@ -90,10 +85,8 @@ export class RoleGuard implements CanActivate {
   providedIn: 'root'
 })
 export class GuestGuard implements CanActivate {
-  constructor(
-    private cognitoAuth: CognitoAuthService,
-    private router: Router
-  ) {}
+  private cognitoAuth = inject(CognitoAuthService);
+  private router = inject(Router);
 
   canActivate(): Observable<boolean> {
     return this.cognitoAuth.authState$.pipe(

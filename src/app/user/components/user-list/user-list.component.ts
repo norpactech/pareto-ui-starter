@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
@@ -29,16 +29,14 @@ import { UserProfileComponent } from '../user-profile/user-profile.component';
   styleUrl: './user-list.component.scss'
 })
 export class UserListComponent implements OnInit, OnDestroy {
+  private userService = inject(UserService);
+  private dialog = inject(MatDialog);
+  private snackBar = inject(MatSnackBar);
+
   users: User[] = [];
   isLoading = false;
   displayedColumns: string[] = ['name', 'email', 'phone', 'lastUpdated', 'actions'];
   private destroy$ = new Subject<void>();
-
-  constructor(
-    private userService: UserService,
-    private dialog: MatDialog,
-    private snackBar: MatSnackBar
-  ) {}
 
   ngOnInit(): void {
     this.loadUsers();
@@ -57,8 +55,7 @@ export class UserListComponent implements OnInit, OnDestroy {
         next: (users) => {
           this.users = users;
           this.isLoading = false;
-        },
-        error: (error) => {
+        },        error: (error: unknown) => {
           console.error('Error loading users:', error);
           this.showError('Failed to load users');
           this.isLoading = false;
@@ -90,10 +87,10 @@ export class UserListComponent implements OnInit, OnDestroy {
           next: () => {
             this.loadUsers(); // Refresh the list
             this.showSuccess('User deleted successfully');
-          },
-          error: (error) => {
+          },          error: (error: unknown) => {
             console.error('Error deleting user:', error);
-            this.showError(error.message || 'Failed to delete user');
+            const errorMessage = error instanceof Error ? error.message : 'Failed to delete user';
+            this.showError(errorMessage);
           }
         });
     }

@@ -12,8 +12,7 @@ import {
   ChangePasswordCommand,
   GetUserCommand,
   ResendConfirmationCodeCommand,
-  AuthFlowType,
-  ChallengeNameType
+  AuthFlowType
 } from '@aws-sdk/client-cognito-identity-provider';
 
 import { BaseAuthProvider } from './base-auth.provider';
@@ -175,8 +174,7 @@ export class CognitoAuthProvider extends BaseAuthProvider {  private environment
       map(() => {
         this.clearStoredTokens();
         this.clearAuthState();
-      }),
-      catchError(error => {
+      }),      catchError(() => {
         // Even if global sign out fails, clear local state
         this.clearStoredTokens();
         this.clearAuthState();
@@ -265,14 +263,13 @@ export class CognitoAuthProvider extends BaseAuthProvider {  private environment
       AccessToken: this.accessToken
     });
 
-    return from(this.cognitoClient.send(command)).pipe(
-      map(response => {
-        const attributes: Record<string, any> = {};
+    return from(this.cognitoClient.send(command)).pipe(      map(response => {
+        const attributes: Record<string, string> = {};
         response.UserAttributes?.forEach(attr => {
           if (attr.Name && attr.Value) {
             attributes[attr.Name] = attr.Value;
           }
-        });        return {
+        });return {
           id: response.Username!,
           email: attributes['email'] || '',
           emailVerified: attributes['email_verified'] === 'true',
@@ -305,11 +302,11 @@ export class CognitoAuthProvider extends BaseAuthProvider {  private environment
       catchError(() => of(false))
     );
   }
-
   // Cognito-specific error mapping
-  protected override mapProviderError(error: any, context: string): AuthError {
-    const errorCode = error.name || error.__type || error.code;
-    const errorMessage = error.message || 'An error occurred';
+  protected override mapProviderError(error: unknown, context: string): AuthError {
+    const errorObject = error as { name?: string; __type?: string; code?: string; message?: string };
+    const errorCode = errorObject.name || errorObject.__type || errorObject.code;
+    const errorMessage = errorObject.message || 'An error occurred';
 
     switch (errorCode) {
       case 'UserNotFoundException':
@@ -352,8 +349,7 @@ export class CognitoAuthProvider extends BaseAuthProvider {  private environment
         email: payload.email || '',
         emailVerified: payload.email_verified || false,
         attributes: payload
-      };
-    } catch (error) {
+      };    } catch {
       throw new AuthError(
         AuthErrorType.INVALID_TOKEN,
         'Failed to parse user information from token'

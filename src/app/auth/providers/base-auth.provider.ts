@@ -71,8 +71,7 @@ export abstract class BaseAuthProvider implements IAuthProvider {
   protected setError(error: string | null): void {
     this.updateAuthState({ error });
   }
-
-  protected handleError(error: any, context: string): Observable<never> {
+  protected handleError(error: unknown, context: string): Observable<never> {
     console.error(`Auth error in ${context}:`, error);
     
     let authError: AuthError;
@@ -97,7 +96,7 @@ export abstract class BaseAuthProvider implements IAuthProvider {
       hasNumber: /[0-9]/.test(password),
       hasUpper: /[A-Z]/.test(password),
       hasLower: /[a-z]/.test(password),
-      hasSpecial: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password)
+      hasSpecial: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password)
     };
 
     const isValid = Object.values(requirements).every(req => req);
@@ -115,21 +114,25 @@ export abstract class BaseAuthProvider implements IAuthProvider {
       errors
     };
   }
-
   // Provider-specific error mapping (should be overridden by concrete implementations)
-  protected mapProviderError(error: any, context: string): AuthError {
+  protected mapProviderError(error: unknown, context: string): AuthError {
     // Default error mapping - providers should override this
-    if (error?.message?.includes('network') || error?.message?.includes('Network')) {
-      return new AuthError(
-        AuthErrorType.NETWORK_ERROR,
-        'Network connection error. Please check your internet connection.',
-        error
-      );
+    if (error && typeof error === 'object' && 'message' in error) {
+      const errorMessage = String((error as { message: unknown }).message);
+      if (errorMessage.includes('network') || errorMessage.includes('Network')) {
+        return new AuthError(
+          AuthErrorType.NETWORK_ERROR,
+          'Network connection error. Please check your internet connection.',
+          error
+        );
+      }
     }
 
     return new AuthError(
       AuthErrorType.UNKNOWN_ERROR,
-      error?.message || 'An unexpected error occurred',
+      error && typeof error === 'object' && 'message' in error 
+        ? String((error as { message: unknown }).message)
+        : 'An unexpected error occurred',
       error,
       { context }
     );

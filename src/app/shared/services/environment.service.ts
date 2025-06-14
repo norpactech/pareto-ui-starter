@@ -72,7 +72,7 @@ export class EnvironmentService {
   }
 
   // Logging helper
-  log(level: 'debug' | 'info' | 'warn' | 'error', message: string, ...args: any[]): void {
+  log(level: 'debug' | 'info' | 'warn' | 'error', message: string, ...args: unknown[]): void {
     if (!this.enableLogging) return;
 
     const logLevels = ['debug', 'info', 'warn', 'error'];

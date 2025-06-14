@@ -1,6 +1,6 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
@@ -14,6 +14,10 @@ import { CognitoAuthService } from '../../services/cognito-auth.service';
   styleUrls: ['./sign-up.component.scss']
 })
 export class SignUpComponent implements OnInit, OnDestroy {
+  private fb = inject(FormBuilder);
+  private cognitoAuth = inject(CognitoAuthService);
+  private router = inject(Router);
+  
   signUpForm!: FormGroup;
   verificationForm!: FormGroup;
   hidePassword = true;
@@ -25,12 +29,6 @@ export class SignUpComponent implements OnInit, OnDestroy {
   codeDeliveryDestination = '';
   
   private destroy$ = new Subject<void>();
-
-  constructor(
-    private fb: FormBuilder,
-    private cognitoAuth: CognitoAuthService,
-    private router: Router
-  ) {}
 
   ngOnInit(): void {
     this.initializeForms();
@@ -64,14 +62,14 @@ export class SignUpComponent implements OnInit, OnDestroy {
         this.error = state.error;
       });
   }  // Custom password validator for Cognito password policy
-  private passwordValidator(control: any) {
+  private passwordValidator(control: AbstractControl) {
     const password = control.value;
     if (!password) return null;
 
     const hasNumber = /[0-9]/.test(password);
     const hasUpper = /[A-Z]/.test(password);
     const hasLower = /[a-z]/.test(password);
-    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+    const hasSpecial = /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
     const minLength = password.length >= 8;
 
     const passwordValid = hasNumber && hasUpper && hasLower && hasSpecial && minLength;
@@ -116,8 +114,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
           this.codeDeliveryDestination = result.codeDeliveryDetails?.destination || formValue.email;
           this.showVerification = true;
           this.error = null;
-        },
-        error: (error: any) => {
+        },        error: (error: unknown) => {
           console.error('Sign up failed:', error);
         }
       });
@@ -138,8 +135,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
             this.router.navigate(['/auth/signin'], { 
               queryParams: { message: 'Account verified successfully. Please sign in.' }
             });
-          },
-          error: (error: any) => {
+          },          error: (error: unknown) => {
             console.error('Verification failed:', error);
           }
         });
@@ -157,8 +153,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
           if (result.CodeDeliveryDetails?.Destination) {
             this.codeDeliveryDestination = result.CodeDeliveryDetails.Destination;
           }
-        },
-        error: (error: any) => {
+        },        error: (error: unknown) => {
           console.error('Resend code failed:', error);
         }
       });
@@ -204,14 +199,13 @@ export class SignUpComponent implements OnInit, OnDestroy {
     }
     
     return '';
-  }
-  private getPasswordPolicyError(policyError: any): string {
+  }  private getPasswordPolicyError(policyError: Record<string, boolean>): string {
     const requirements = [];
-    if (!policyError.minLength) requirements.push('at least 8 characters');
-    if (!policyError.hasNumber) requirements.push('at least 1 number');
-    if (!policyError.hasUpper) requirements.push('at least 1 uppercase letter');
-    if (!policyError.hasLower) requirements.push('at least 1 lowercase letter');
-    if (!policyError.hasSpecial) requirements.push('at least 1 special character');
+    if (!policyError['minLength']) requirements.push('at least 8 characters');
+    if (!policyError['hasNumber']) requirements.push('at least 1 number');
+    if (!policyError['hasUpper']) requirements.push('at least 1 uppercase letter');
+    if (!policyError['hasLower']) requirements.push('at least 1 lowercase letter');
+    if (!policyError['hasSpecial']) requirements.push('at least 1 special character');
     
     return `Password must contain ${requirements.join(', ')}`;
   }
@@ -229,9 +223,8 @@ export class SignUpComponent implements OnInit, OnDestroy {
       case 'hasUpper':
         return /[A-Z]/.test(password);
       case 'hasLower':
-        return /[a-z]/.test(password);
-      case 'hasSpecial':
-        return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
+        return /[a-z]/.test(password);      case 'hasSpecial':
+        return /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(password);
       default:
         return false;
     }

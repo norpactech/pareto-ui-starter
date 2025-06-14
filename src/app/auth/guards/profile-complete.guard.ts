@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, take, switchMap } from 'rxjs/operators';
@@ -9,12 +9,9 @@ import { UserService } from '../../shared/services/user.service';
   providedIn: 'root'
 })
 export class ProfileCompleteGuard implements CanActivate {
-
-  constructor(
-    private cognitoAuth: CognitoAuthService,
-    private userService: UserService,
-    private router: Router
-  ) {}
+  private cognitoAuth = inject(CognitoAuthService);
+  private userService = inject(UserService);
+  private router = inject(Router);
 
   canActivate(
     route: ActivatedRouteSnapshot,

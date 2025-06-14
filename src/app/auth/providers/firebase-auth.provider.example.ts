@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { Injectable } from '@angular/core';
 import { Observable, from, throwError, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
@@ -271,6 +272,7 @@ export class FirebaseAuthProvider extends BaseAuthProvider {
   }
 
   // Firebase-specific error mapping
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   protected override mapProviderError(error: any, context: string): AuthError {
     const errorCode = error.code;
     

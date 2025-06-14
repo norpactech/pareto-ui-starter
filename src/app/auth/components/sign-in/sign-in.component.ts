@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
@@ -14,18 +14,16 @@ import { CognitoAuthService } from '../../services/cognito-auth.service';
   styleUrl: './sign-in.component.scss'
 })
 export class SignInComponent implements OnInit, OnDestroy {
+  private fb = inject(FormBuilder);
+  private cognitoAuth = inject(CognitoAuthService);
+  private router = inject(Router);
+  
   signInForm!: FormGroup;
   hidePassword = true;
   loading = false;
   error: string | null = null;
   
   private destroy$ = new Subject<void>();
-
-  constructor(
-    private fb: FormBuilder,
-    private cognitoAuth: CognitoAuthService,
-    private router: Router
-  ) {}
 
   ngOnInit(): void {
     this.initializeForm();
@@ -65,8 +63,7 @@ export class SignInComponent implements OnInit, OnDestroy {
             const redirectUrl = localStorage.getItem('redirectUrl') || '/dashboard';
             localStorage.removeItem('redirectUrl');
             this.router.navigate([redirectUrl]);
-          },
-          error: (error: any) => {
+          },          error: (error: unknown) => {
             console.error('Sign in failed:', error);
           }
         });

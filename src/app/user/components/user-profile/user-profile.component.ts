@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
@@ -30,23 +30,23 @@ import { User, UpdateUserRequest } from '../../../shared/models/user.models';
   styleUrl: './user-profile.component.scss'
 })
 export class UserProfileComponent implements OnInit, OnDestroy {
+  private fb = inject(FormBuilder);
+  private userService = inject(UserService);
+  private dialogRef = inject(MatDialogRef<UserProfileComponent>);
+  private snackBar = inject(MatSnackBar);
+
   profileForm: FormGroup;
   currentUser: User | null = null;
   isLoading = false;
   isSaving = false;
   private destroy$ = new Subject<void>();
 
-  constructor(
-    private fb: FormBuilder,
-    private userService: UserService,
-    private dialogRef: MatDialogRef<UserProfileComponent>,
-    private snackBar: MatSnackBar
-  ) {
+  constructor() {
     this.profileForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[\d\s\-\(\)]+$/)]]
+      phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[\d\s-()]+$/)]]
     });
   }
 
@@ -75,8 +75,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
             });
           }
           this.isLoading = false;
-        },
-        error: (error) => {
+        },        error: (error: unknown) => {
           console.error('Error loading user:', error);
           this.showError('Failed to load user profile');
           this.isLoading = false;
@@ -95,10 +94,10 @@ export class UserProfileComponent implements OnInit, OnDestroy {
           next: (updatedUser) => {
             this.showSuccess('Profile updated successfully');
             this.dialogRef.close(updatedUser);
-          },
-          error: (error) => {
+          },          error: (error: unknown) => {
             console.error('Error updating profile:', error);
-            this.showError(error.message || 'Failed to update profile');
+            const errorMessage = error instanceof Error ? error.message : 'Failed to update profile';
+            this.showError(errorMessage);
             this.isSaving = false;
           }
         });
@@ -138,9 +137,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     }
     if (control?.hasError('email')) {
       return 'Please enter a valid email address';
-    }
-    if (control?.hasError('minlength')) {
-      return `${this.getFieldDisplayName(fieldName)} must be at least ${control.errors?.['minlength']?.requiredLength} characters`;
+    }    if (control?.hasError('minlength')) {
+      const minLengthError = control.errors?.['minlength'] as { requiredLength?: number };
+      return `${this.getFieldDisplayName(fieldName)} must be at least ${minLengthError?.requiredLength || 2} characters`;
     }
     if (control?.hasError('pattern')) {
       return 'Please enter a valid phone number';
