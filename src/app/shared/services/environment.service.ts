@@ -50,6 +50,10 @@ export class EnvironmentService {
     return environment.auth;
   }
 
+  get cognito() {
+    return environment.cognito;
+  }
+
   get ui() {
     return environment.ui;
   }
