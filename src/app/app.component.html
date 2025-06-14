@@ -9,8 +9,7 @@
   </button>
     <h1 class="logo">{{ title }}</h1>
   
-  <div class="header-actions">
-    <!-- Authenticated User Actions -->
+  <div class="header-actions">    <!-- Authenticated User Actions -->
     <ng-container *ngIf="isAuthenticated">
       <!-- User Profile Button -->
       <button class="user-profile-btn mat-icon-button" 
@@ -19,13 +18,20 @@
         <mat-icon class="user-icon">account_circle</mat-icon>
       </button>
       
+      <!-- Logout Button -->
+      <button class="logout-btn mat-icon-button" 
+              (click)="signOut()" 
+              matTooltip="Sign Out">
+        <mat-icon class="logout-icon">logout</mat-icon>
+      </button>
+      
       <!-- Theme Toggle -->
       <button class="theme-toggle mat-icon-button" 
               (click)="toggleTheme()" 
               [attr.aria-label]="isDarkTheme ? 'Switch to light theme' : 'Switch to dark theme'">
         <mat-icon class="theme-icon">{{ isDarkTheme ? 'light_mode' : 'dark_mode' }}</mat-icon>
       </button>
-    </ng-container>    <!-- Unauthenticated User Actions -->
+    </ng-container><!-- Unauthenticated User Actions -->
     <ng-container *ngIf="!isAuthenticated">
       <button class="auth-btn" routerLink="/auth/signin">
         <mat-icon>login</mat-icon>

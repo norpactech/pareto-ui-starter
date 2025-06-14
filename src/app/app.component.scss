@@ -63,28 +63,53 @@
       color: var(--text-primary);
       font-size: 20px;
     }
-  }.user-profile-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 40px;
-      height: 40px;
-      border-radius: 50%;
-      background: transparent;
-      border: none;
-      cursor: pointer;
-      transition: background-color 0.3s ease;
-      margin-right: 8px;
+  }
 
-      &:hover {
-        background-color: var(--surface-200);
-      }
+  .user-profile-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 8px;
 
-      .user-icon {
-        color: var(--text-primary);
-        font-size: 24px;
-      }
+    &:hover {
+      background-color: var(--surface-200);
     }
+
+    .user-icon {
+      color: var(--text-primary);
+      font-size: 24px;
+    }
+  }
+
+  .logout-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    margin-right: 8px;
+
+    &:hover {
+      background-color: var(--surface-200);
+    }
+
+    .logout-icon {
+      color: var(--text-primary);
+      font-size: 20px;
+    }
+  }
 }
 
 // GitHub-style authentication buttons in header

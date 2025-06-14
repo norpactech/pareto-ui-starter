@@ -1,9 +1,11 @@
 import { Routes } from '@angular/router';
 import { AuthGuard } from './auth/guards/auth.guard';
+import { ProfileCompleteGuard } from './auth/guards/profile-complete.guard';
 import { HomeComponent } from './home/home.component';
 import { HelpComponent } from './help/help.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
 import { ProfileComponent } from './profile/profile.component';
+import { CompleteProfileComponent } from './profile/complete-profile.component';
 import { SettingsComponent } from './settings/settings.component';
 
 export const routes: Routes = [
@@ -21,19 +23,22 @@ export const routes: Routes = [
   },
   {
     path: 'users',
-    loadChildren: () => import('./user/user.module').then(m => m.UserModule)
-  },  {
+    loadChildren: () => import('./user/user.module').then(m => m.UserModule)  },  {
     path: 'dashboard',
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, ProfileCompleteGuard],
     component: DashboardComponent
   },  {
-    path: 'profile',
+    path: 'complete-profile',
     canActivate: [AuthGuard],
+    component: CompleteProfileComponent
+  },  {
+    path: 'profile',
+    canActivate: [AuthGuard, ProfileCompleteGuard],
     component: ProfileComponent
   },
   {
     path: 'settings',
-    canActivate: [AuthGuard],
+    canActivate: [AuthGuard, ProfileCompleteGuard],
     component: SettingsComponent
   },
   {

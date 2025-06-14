@@ -150,4 +150,44 @@ export class UserService {
 
     return this.updateUser(currentUser.id, userData);
   }
+
+  // Create user profile for Cognito user (after authentication)
+  createUserProfile(userProfile: any): Observable<User> {
+    const users = this.usersSubject.value;
+    
+    // Check if profile already exists for this Cognito user
+    if (users.some(u => u.email === userProfile.email)) {
+      return throwError(() => new Error('User profile already exists')).pipe(delay(300));
+    }
+
+    const newUser: User = {
+      id: (users.length + 1).toString(),
+      firstName: userProfile.firstName,
+      lastName: userProfile.lastName,
+      email: userProfile.email,
+      phoneNumber: userProfile.phoneNumber,
+      createdAt: new Date(userProfile.createdAt),
+      updatedAt: new Date(userProfile.updatedAt)
+    };
+
+    const updatedUsers = [...users, newUser];
+    this.usersSubject.next(updatedUsers);
+    
+    // Set as current user
+    this.currentUserSubject.next(newUser);
+
+    return of(newUser).pipe(delay(500));
+  }
+
+  // Check if user profile exists for Cognito user
+  checkUserProfile(email: string): Observable<User | null> {
+    const users = this.usersSubject.value;
+    const user = users.find(u => u.email === email) || null;
+    
+    if (user) {
+      this.currentUserSubject.next(user);
+    }
+    
+    return of(user).pipe(delay(300));
+  }
 }
