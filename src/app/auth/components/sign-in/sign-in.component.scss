@@ -111,10 +111,7 @@
           font-size: 20px;
         }
       }
-    }
-
-    .field-error {
-      color: #f44336;
+    }    .field-error {      color: #f44336;
       font-size: 0.8rem;
       margin-top: 6px;
       display: block;
@@ -326,5 +323,18 @@
 
   .submit-btn {
     margin-bottom: 20px;
+  }
+}
+
+// Dark theme support
+:host-context(.dark-theme) {
+  .alert.alert-error {
+    background-color: #3c1f1f;
+    border-color: #5c2e2e;
+    color: #ef5350;
+    
+    .icon-error {
+      color: #ef5350;
+    }
   }
 }

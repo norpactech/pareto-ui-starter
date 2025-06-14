@@ -1,19 +1,17 @@
 import { Injectable } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
-import { Observable, throwError, BehaviorSubject } from 'rxjs';
-import { catchError, filter, take, switchMap } from 'rxjs/operators';
-import { AuthService } from '../services/auth.service';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
+import { CognitoAuthService } from '../services/cognito-auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
-  private isRefreshing = false;
-  private refreshTokenSubject: BehaviorSubject<any> = new BehaviorSubject<any>(null);
 
-  constructor(private authService: AuthService) {}
+  constructor(private cognitoAuth: CognitoAuthService) {}
 
   intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
     // Add auth token to requests
-    const authToken = this.authService.getToken();
+    const authToken = this.cognitoAuth.accessToken;
     if (authToken && !this.isAuthRequest(request.url)) {
       request = this.addTokenToRequest(request, authToken);
     }
@@ -22,10 +20,10 @@ export class AuthInterceptor implements HttpInterceptor {
       catchError((error: HttpErrorResponse) => {
         // Handle 401 unauthorized errors
         if (error.status === 401 && !this.isAuthRequest(request.url)) {
-          return this.handle401Error(request, next);
+          // Sign out user on 401 (token expired or invalid)
+          this.cognitoAuth.signOut();
         }
-        
-        return throwError(error);
+        return throwError(() => error);
       })
     );
   }
@@ -38,41 +36,8 @@ export class AuthInterceptor implements HttpInterceptor {
     });
   }
 
-  private handle401Error(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    if (!this.isRefreshing) {
-      this.isRefreshing = true;
-      this.refreshTokenSubject.next(null);
-
-      return this.authService.refreshToken().pipe(
-        switchMap((tokenResponse: any) => {
-          this.isRefreshing = false;
-          this.refreshTokenSubject.next(tokenResponse.accessToken);
-          
-          return next.handle(this.addTokenToRequest(request, tokenResponse.accessToken));
-        }),
-        catchError((error) => {
-          this.isRefreshing = false;
-          this.authService.signOut();
-          return throwError(error);
-        })
-      );
-    } else {
-      return this.refreshTokenSubject.pipe(
-        filter(token => token != null),
-        take(1),
-        switchMap(token => {
-          return next.handle(this.addTokenToRequest(request, token));
-        })
-      );
-    }
-  }
-
   private isAuthRequest(url: string): boolean {
-    // Don't add token to auth endpoints
-    return url.includes('/auth/signin') || 
-           url.includes('/auth/signup') || 
-           url.includes('/auth/refresh-token') ||
-           url.includes('/auth/forgot-password') ||
-           url.includes('/auth/reset-password');
+    // Don't add token to authentication requests or AWS Cognito requests
+    return url.includes('/auth/') || url.includes('cognito-idp') || url.includes('amazonaws.com');
   }
 }

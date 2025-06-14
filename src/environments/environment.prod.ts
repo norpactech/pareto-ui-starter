@@ -8,11 +8,14 @@ export const environment = {
   development: false,
   environmentName: 'production',
   apiUrl: 'https://api.northernpacifictech.com/api',
-  authUrl: 'https://api.northernpacifictech.com/api/auth',
   wsUrl: 'wss://api.northernpacifictech.com',
   enableLogging: false,
   enableDebugInfo: false,
-  logLevel: 'error',
+  logLevel: 'error',  cognito: {
+    region: 'us-west-2',
+    userPoolId: 'us-west-2_kYxBT6G5H',
+    userPoolClientId: '7172bfnjgp98t3pjhj0ktj7360'
+  },
   features: {
     enableAnalytics: true,
     enableErrorReporting: true,

@@ -13,10 +13,9 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThemeService } from './shared/services/theme.service';
 import { UserService } from './user/services/user.service';
-import { AuthService } from './auth/services/auth.service';
+import { CognitoAuthService, CognitoAuthState } from './auth/services/cognito-auth.service';
 import { UserProfileComponent } from './user/components/user-profile/user-profile.component';
 import { User } from './shared/models/user.models';
-import { AuthState, User as AuthUser } from './auth/models/auth.models';
 
 @Component({
   selector: 'app-root',
@@ -24,38 +23,38 @@ import { AuthState, User as AuthUser } from './auth/models/auth.models';
   templateUrl: './app.component.html',
   styleUrl: './app.component.scss'
 })
-export class AppComponent implements OnInit {
-  title = 'Pareto UI Starter';
+export class AppComponent implements OnInit {  title = 'Pareto UI Starter';
   isMenuOpen = false;
   isDarkTheme = false;
-  authState: AuthState = {
+  authState: CognitoAuthState = {
     isAuthenticated: false,
     user: null,
     loading: false,
-    error: null
+    error: null,
+    accessToken: null,
+    idToken: null,
+    refreshToken: null
   };
 
   get isAuthenticated(): boolean {
     return this.authState.isAuthenticated;
   }
 
-  get currentUser(): AuthUser | null {
+  get currentUser(): any {
     return this.authState.user;
   }
 
   constructor(
     private themeService: ThemeService,
     private userService: UserService,
-    private authService: AuthService,
+    private cognitoAuth: CognitoAuthService,
     private dialog: MatDialog
-  ) {}  ngOnInit(): void {
+  ) {}ngOnInit(): void {
     // Subscribe to theme changes
     this.themeService.theme$.subscribe(theme => {
       this.isDarkTheme = theme === 'dark';
-    });
-
-    // Subscribe to authentication state
-    this.authService.authState$.subscribe(authState => {
+    });    // Subscribe to authentication state
+    this.cognitoAuth.authState$.subscribe(authState => {
       this.authState = authState;
     });
   }
@@ -90,6 +89,19 @@ export class AppComponent implements OnInit {
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
         console.log('User profile updated:', result);
+      }
+    });
+  }
+
+  signOut(): void {
+    this.cognitoAuth.signOut().subscribe({
+      next: () => {
+        this.closeMenu();
+        console.log('User signed out successfully');
+      },
+      error: (error) => {
+        console.error('Sign out error:', error);
+        this.closeMenu();
       }
     });
   }

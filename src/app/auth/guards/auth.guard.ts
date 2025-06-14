@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { CanActivate, CanActivateChild, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { Observable } from 'rxjs';
 import { map, take } from 'rxjs/operators';
-import { AuthService } from '../services/auth.service';
+import { CognitoAuthService } from '../services/cognito-auth.service';
 
 @Injectable({
   providedIn: 'root'
@@ -10,7 +10,7 @@ import { AuthService } from '../services/auth.service';
 export class AuthGuard implements CanActivate, CanActivateChild {
 
   constructor(
-    private authService: AuthService,
+    private cognitoAuth: CognitoAuthService,
     private router: Router
   ) {}
 
@@ -27,9 +27,8 @@ export class AuthGuard implements CanActivate, CanActivateChild {
   ): Observable<boolean> | Promise<boolean> | boolean {
     return this.checkAuth(state.url);
   }
-
   private checkAuth(url: string): Observable<boolean> {
-    return this.authService.authState$.pipe(
+    return this.cognitoAuth.authState$.pipe(
       take(1),
       map(authState => {
         if (authState.isAuthenticated) {
@@ -51,7 +50,7 @@ export class AuthGuard implements CanActivate, CanActivateChild {
 })
 export class RoleGuard implements CanActivate {
   constructor(
-    private authService: AuthService,
+    private cognitoAuth: CognitoAuthService,
     private router: Router
   ) {}
 
@@ -61,7 +60,7 @@ export class RoleGuard implements CanActivate {
   ): Observable<boolean> | Promise<boolean> | boolean {
     const requiredRole = route.data['role'] as string;
     
-    return this.authService.authState$.pipe(
+    return this.cognitoAuth.authState$.pipe(
       take(1),
       map(authState => {
         if (!authState.isAuthenticated) {
@@ -70,9 +69,15 @@ export class RoleGuard implements CanActivate {
           return false;
         }
 
-        if (requiredRole && !this.authService.hasRole(requiredRole)) {
-          this.router.navigate(['/unauthorized']);
-          return false;
+        // Note: Cognito roles would be checked from user attributes
+        // For now, we'll allow all authenticated users
+        // You can implement role checking from user.attributes if needed
+        if (requiredRole) {
+          const userRoles = authState.user?.attributes?.['custom:roles'] || '';
+          if (!userRoles.includes(requiredRole)) {
+            this.router.navigate(['/unauthorized']);
+            return false;
+          }
         }
 
         return true;
@@ -87,12 +92,12 @@ export class RoleGuard implements CanActivate {
 })
 export class GuestGuard implements CanActivate {
   constructor(
-    private authService: AuthService,
+    private cognitoAuth: CognitoAuthService,
     private router: Router
   ) {}
 
   canActivate(): Observable<boolean> {
-    return this.authService.authState$.pipe(
+    return this.cognitoAuth.authState$.pipe(
       take(1),
       map(authState => {
         if (authState.isAuthenticated) {

@@ -4,8 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { Router, RouterLink } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { AuthService } from '../../services/auth.service';
-import { SignInRequest } from '../../models/auth.models';
+import { CognitoAuthService } from '../../services/cognito-auth.service';
 
 @Component({
   selector: 'app-sign-in',
@@ -24,7 +23,7 @@ export class SignInComponent implements OnInit, OnDestroy {
 
   constructor(
     private fb: FormBuilder,
-    private authService: AuthService,
+    private cognitoAuth: CognitoAuthService,
     private router: Router
   ) {}
 
@@ -36,18 +35,15 @@ export class SignInComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
-
-  private initializeForm(): void {
+  }  private initializeForm(): void {
     this.signInForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required]],
       rememberMe: [false]
     });
   }
-
   private subscribeToAuthState(): void {
-    this.authService.authState$
+    this.cognitoAuth.authState$
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
         this.loading = state.loading;
@@ -58,13 +54,10 @@ export class SignInComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     if (this.signInForm.valid) {
       const formValue = this.signInForm.value;
-      const signInData: SignInRequest = {
-        email: formValue.email.trim().toLowerCase(),
-        password: formValue.password,
-        rememberMe: formValue.rememberMe
-      };
+      const username = formValue.email.trim().toLowerCase();
+      const password = formValue.password;
 
-      this.authService.signIn(signInData)
+      this.cognitoAuth.signIn(username, password)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
@@ -73,7 +66,7 @@ export class SignInComponent implements OnInit, OnDestroy {
             localStorage.removeItem('redirectUrl');
             this.router.navigate([redirectUrl]);
           },
-          error: (error) => {
+          error: (error: any) => {
             console.error('Sign in failed:', error);
           }
         });
@@ -89,9 +82,7 @@ export class SignInComponent implements OnInit, OnDestroy {
   isFieldInvalid(fieldName: string): boolean {
     const field = this.signInForm.get(fieldName);
     return !!(field && field.invalid && (field.dirty || field.touched));
-  }
-
-  getFieldError(fieldName: string): string {
+  }  getFieldError(fieldName: string): string {
     const field = this.signInForm.get(fieldName);
     if (field && field.errors && (field.dirty || field.touched)) {
       if (field.errors['required']) {
@@ -99,9 +90,6 @@ export class SignInComponent implements OnInit, OnDestroy {
       }
       if (field.errors['email']) {
         return 'Please enter a valid email address';
-      }
-      if (field.errors['minlength']) {
-        return `Password must be at least ${field.errors['minlength'].requiredLength} characters`;
       }
     }
     return '';

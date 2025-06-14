@@ -22,13 +22,8 @@ export class EnvironmentService {
   get environmentName(): string {
     return environment.environmentName;
   }
-
   get apiUrl(): string {
     return environment.apiUrl;
-  }
-
-  get authUrl(): string {
-    return environment.authUrl;
   }
 
   get wsUrl(): string {

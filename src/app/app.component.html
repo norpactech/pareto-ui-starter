@@ -57,8 +57,7 @@
       </a>
       
       <!-- Authenticated User Menu Items -->
-      <ng-container *ngIf="isAuthenticated">
-        <a href="#" class="menu-item mat-list-item" (click)="closeMenu()">
+      <ng-container *ngIf="isAuthenticated">        <a routerLink="/dashboard" class="menu-item mat-list-item" (click)="closeMenu()">
           <span class="menu-icon material-icons">dashboard</span>
           <span class="menu-text">Dashboard</span>
         </a>
@@ -105,9 +104,8 @@
         </a>
       </ng-container>
     </div>
-    
-    <div class="menu-footer" *ngIf="isAuthenticated">
-      <a href="#" class="menu-item mat-list-item logout" (click)="closeMenu()">
+      <div class="menu-footer" *ngIf="isAuthenticated">
+      <a class="menu-item mat-list-item logout" (click)="signOut()">
         <span class="menu-icon material-icons">logout</span>
         <span class="menu-text">Logout</span>
       </a>

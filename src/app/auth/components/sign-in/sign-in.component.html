@@ -49,9 +49,7 @@
           [attr.aria-label]="hidePassword ? 'Show password' : 'Hide password'"
         >
           <span class="material-icons">{{ hidePassword ? 'visibility' : 'visibility_off' }}</span>
-        </button>
-      </div>
-      <div class="field-error" *ngIf="isFieldInvalid('password')">
+        </button>      </div>      <div class="field-error" *ngIf="isFieldInvalid('password')">
         {{ getFieldError('password') }}
       </div>
     </div>

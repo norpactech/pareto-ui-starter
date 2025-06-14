@@ -6,13 +6,16 @@
 export const environment = {
   production: false,
   development: true,
-  environmentName: 'local',
-  apiUrl: 'http://localhost:3000/api',
-  authUrl: 'http://localhost:3000/api/auth',
+  environmentName: 'local',  apiUrl: 'http://localhost:3000/api',
   wsUrl: 'ws://localhost:3000',
   enableLogging: true,
   enableDebugInfo: true,
   logLevel: 'debug',
+  cognito: {
+    region: 'us-west-2',
+    userPoolId: 'us-west-2_kYxBT6G5H',
+    userPoolClientId: '7172bfnjgp98t3pjhj0ktj7360'
+  },
   features: {
     enableAnalytics: false,
     enableErrorReporting: false,
