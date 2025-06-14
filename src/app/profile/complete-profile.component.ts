@@ -1,10 +1,10 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule, AbstractControl } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject } from 'rxjs';
 import { takeUntil } from 'rxjs/operators';
-import { CognitoAuthService } from '../auth/services/cognito-auth.service';
+import { CognitoAuthService, CognitoUser } from '../auth/services/cognito-auth.service';
 import { UserService } from '../shared/services/user.service';
 
 @Component({
@@ -15,19 +15,17 @@ import { UserService } from '../shared/services/user.service';
   styleUrls: ['./complete-profile.component.scss']
 })
 export class CompleteProfileComponent implements OnInit, OnDestroy {
+  private fb = inject(FormBuilder);
+  private cognitoAuth = inject(CognitoAuthService);
+  private userService = inject(UserService);
+  private router = inject(Router);
+
   profileForm!: FormGroup;
   loading = false;
   error: string | null = null;
-  currentUser: any = null;
+  currentUser: CognitoUser | null = null;
   
   private destroy$ = new Subject<void>();
-
-  constructor(
-    private fb: FormBuilder,
-    private cognitoAuth: CognitoAuthService,
-    private userService: UserService,
-    private router: Router
-  ) {}
 
   ngOnInit(): void {
     this.initializeForm();
@@ -57,14 +55,13 @@ export class CompleteProfileComponent implements OnInit, OnDestroy {
         }
       });
   }
-
   // Custom phone number validator
-  private phoneValidator(control: any) {
+  private phoneValidator(control: AbstractControl) {
     const phoneNumber = control.value;
     if (!phoneNumber) return null;
 
     // Basic phone number validation (can be enhanced based on requirements)
-    const phoneRegex = /^\+?[\d\s\-\(\)]{10,}$/;
+    const phoneRegex = /^\+?[\d\s\-()]{10,}$/;
     return phoneRegex.test(phoneNumber) ? null : { invalidPhone: true };
   }
 
@@ -76,23 +73,21 @@ export class CompleteProfileComponent implements OnInit, OnDestroy {
       const formValue = this.profileForm.value;
       const userProfile = {
         cognitoUserId: this.currentUser.username, // Cognito user ID
-        email: this.currentUser.email,
-        firstName: formValue.firstName,
+        email: this.currentUser.email,        firstName: formValue.firstName,
         lastName: formValue.lastName,
         phoneNumber: formValue.phoneNumber,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString()
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
 
       // Call your API to create user profile in your database
       this.userService.createUserProfile(userProfile)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (response) => {
+        .pipe(takeUntil(this.destroy$))        .subscribe({
+          next: () => {
             // Profile created successfully, redirect to dashboard
             this.router.navigate(['/dashboard']);
           },
-          error: (error: any) => {
+          error: (error: unknown) => {
             console.error('Profile creation failed:', error);
             this.error = 'Failed to create profile. Please try again.';
             this.loading = false;

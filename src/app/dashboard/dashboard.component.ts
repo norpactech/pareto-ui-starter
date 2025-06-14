@@ -3,7 +3,7 @@
  * Licensed under the MIT License.
  */
 
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
@@ -29,10 +29,10 @@ import { CognitoAuthService, CognitoAuthState } from '../auth/services/cognito-a
   styleUrls: ['./dashboard.component.scss']
 })
 export class DashboardComponent implements OnInit, OnDestroy {
+  private cognitoAuth = inject(CognitoAuthService);
+  
   authState: CognitoAuthState | null = null;
   private destroy$ = new Subject<void>();
-
-  constructor(private cognitoAuth: CognitoAuthService) {}
 
   ngOnInit(): void {
     this.cognitoAuth.authState$

@@ -1,5 +1,15 @@
-import { Injectable } from '@angular/core';
-import { IAuthProvider, IAuthProviderFactory, AuthProviderConfig } from '../interfaces/auth-provider.interface';
+import { Injectable, inject } from '@angular/core';
+import { 
+  IAuthProvider, 
+  IAuthProviderFactory, 
+  AuthProviderConfig,
+  SignUpRequest,
+  SignInRequest,
+  EmailVerificationRequest,
+  ResendVerificationRequest,
+  PasswordResetConfirmation,
+  PasswordChangeRequest
+} from '../interfaces/auth-provider.interface';
 import { CognitoAuthProvider } from '../providers/cognito-auth.provider';
 import { EnvironmentService } from '../../shared/services/environment.service';
 
@@ -7,9 +17,8 @@ import { EnvironmentService } from '../../shared/services/environment.service';
   providedIn: 'root'
 })
 export class AuthProviderFactory implements IAuthProviderFactory {
+  private environmentService = inject(EnvironmentService);
   
-  constructor(private environmentService: EnvironmentService) {}
-
   createProvider(config: AuthProviderConfig): IAuthProvider {
     switch (config.type) {
       case 'cognito':
@@ -39,12 +48,12 @@ export class AuthProviderFactory implements IAuthProviderFactory {
   providedIn: 'root'
 })
 export class AuthService {
+  private factory = inject(AuthProviderFactory);
+  private environmentService = inject(EnvironmentService);
+  
   private currentProvider: IAuthProvider;
 
-  constructor(
-    private factory: AuthProviderFactory,
-    private environmentService: EnvironmentService
-  ) {
+  constructor() {
     // Initialize with default provider (Cognito for now)
     const config: AuthProviderConfig = {
       type: 'cognito',
@@ -59,16 +68,14 @@ export class AuthService {
   // Delegate all auth operations to the current provider
   get authState$() { return this.currentProvider.authState$; }
   get currentUser$() { return this.currentProvider.currentUser$; }
-  get isAuthenticated$() { return this.currentProvider.isAuthenticated$; }
-
-  signUp = (request: any) => this.currentProvider.signUp(request);
-  signIn = (request: any) => this.currentProvider.signIn(request);
+  get isAuthenticated$() { return this.currentProvider.isAuthenticated$; }  signUp = (request: SignUpRequest) => this.currentProvider.signUp(request);
+  signIn = (request: SignInRequest) => this.currentProvider.signIn(request);
   signOut = () => this.currentProvider.signOut();
-  verifyEmail = (request: any) => this.currentProvider.verifyEmail(request);
-  resendVerificationCode = (request: any) => this.currentProvider.resendVerificationCode(request);
+  verifyEmail = (request: EmailVerificationRequest) => this.currentProvider.verifyEmail(request);
+  resendVerificationCode = (request: ResendVerificationRequest) => this.currentProvider.resendVerificationCode(request);
   forgotPassword = (email: string) => this.currentProvider.forgotPassword(email);
-  confirmForgotPassword = (confirmation: any) => this.currentProvider.confirmForgotPassword(confirmation);
-  changePassword = (request: any) => this.currentProvider.changePassword(request);
+  confirmForgotPassword = (confirmation: PasswordResetConfirmation) => this.currentProvider.confirmForgotPassword(confirmation);
+  changePassword = (request: PasswordChangeRequest) => this.currentProvider.changePassword(request);
   getCurrentUser = () => this.currentProvider.getCurrentUser();
   refreshSession = () => this.currentProvider.refreshSession();
   getAccessToken = () => this.currentProvider.getAccessToken();

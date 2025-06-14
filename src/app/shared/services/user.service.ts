@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { delay } from 'rxjs/operators';
 import { User, CreateUserRequest, UpdateUserRequest } from '../models/user.models';
 
 @Injectable({
@@ -150,24 +150,21 @@ export class UserService {
 
     return this.updateUser(currentUser.id, userData);
   }
-
   // Create user profile for Cognito user (after authentication)
-  createUserProfile(userProfile: any): Observable<User> {
+  createUserProfile(userProfile: Partial<User>): Observable<User> {
     const users = this.usersSubject.value;
     
     // Check if profile already exists for this Cognito user
     if (users.some(u => u.email === userProfile.email)) {
       return throwError(() => new Error('User profile already exists')).pipe(delay(300));
-    }
-
-    const newUser: User = {
+    }    const newUser: User = {
       id: (users.length + 1).toString(),
-      firstName: userProfile.firstName,
-      lastName: userProfile.lastName,
-      email: userProfile.email,
-      phoneNumber: userProfile.phoneNumber,
-      createdAt: new Date(userProfile.createdAt),
-      updatedAt: new Date(userProfile.updatedAt)
+      firstName: userProfile.firstName || '',
+      lastName: userProfile.lastName || '',
+      email: userProfile.email || '',
+      phoneNumber: userProfile.phoneNumber || '',
+      createdAt: userProfile.createdAt || new Date(),
+      updatedAt: userProfile.updatedAt || new Date()
     };
 
     const updatedUsers = [...users, newUser];

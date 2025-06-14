@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { HttpInterceptor, HttpRequest, HttpHandler, HttpEvent, HttpErrorResponse } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
@@ -6,10 +6,9 @@ import { CognitoAuthService } from '../services/cognito-auth.service';
 
 @Injectable()
 export class AuthInterceptor implements HttpInterceptor {
+  private cognitoAuth = inject(CognitoAuthService);
 
-  constructor(private cognitoAuth: CognitoAuthService) {}
-
-  intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
+  intercept(request: HttpRequest<unknown>, next: HttpHandler): Observable<HttpEvent<unknown>> {
     // Add auth token to requests
     const authToken = this.cognitoAuth.accessToken;
     if (authToken && !this.isAuthRequest(request.url)) {
@@ -28,7 +27,7 @@ export class AuthInterceptor implements HttpInterceptor {
     );
   }
 
-  private addTokenToRequest(request: HttpRequest<any>, token: string): HttpRequest<any> {
+  private addTokenToRequest(request: HttpRequest<unknown>, token: string): HttpRequest<unknown> {
     return request.clone({
       setHeaders: {
         Authorization: `Bearer ${token}`

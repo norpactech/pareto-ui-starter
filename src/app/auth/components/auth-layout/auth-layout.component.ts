@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
 
 @Component({
@@ -9,8 +9,7 @@ import { RouterOutlet, Router } from '@angular/router';
   styleUrl: './auth-layout.component.scss'
 })
 export class AuthLayoutComponent {
-
-  constructor(private router: Router) {}
+  private router = inject(Router);
 
   getFormTitle(): string {
     const url = this.router.url;

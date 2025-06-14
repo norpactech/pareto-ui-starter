@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { CanActivate, Router, ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
-import { Observable, combineLatest } from 'rxjs';
+import { Observable } from 'rxjs';
 import { map, take, switchMap } from 'rxjs/operators';
 import { CognitoAuthService } from '../services/cognito-auth.service';
 import { UserService } from '../../shared/services/user.service';

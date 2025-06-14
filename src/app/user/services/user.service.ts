@@ -1,6 +1,6 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
-import { delay, map } from 'rxjs/operators';
+import { delay } from 'rxjs/operators';
 import { User, CreateUserRequest, UpdateUserRequest } from '../../shared/models/user.models';
 import { EnvironmentService } from '../../shared/services/environment.service';
 
@@ -8,6 +8,8 @@ import { EnvironmentService } from '../../shared/services/environment.service';
   providedIn: 'root'
 })
 export class UserService {
+  private environmentService = inject(EnvironmentService);
+  
   private currentUserSubject = new BehaviorSubject<User | null>(null);
   public currentUser$ = this.currentUserSubject.asObservable();
 
@@ -42,9 +44,9 @@ export class UserService {
       phoneNumber: '+1-555-456-7890',
       createdAt: new Date('2023-06-10'),
       updatedAt: new Date('2024-01-05')
-    }
-  ];
-  constructor(private environmentService: EnvironmentService) {
+    }  ];
+  
+  constructor() {
     // Initialize with mock data
     this.usersSubject.next([...this.mockUsers]);
     // Set current user (simulating logged-in user)

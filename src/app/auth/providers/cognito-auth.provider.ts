@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { Observable, from, throwError, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import {
@@ -43,10 +43,14 @@ export interface CognitoConfig {
 @Injectable({
   providedIn: 'root'
 })
-export class CognitoAuthProvider extends BaseAuthProvider {  private cognitoClient!: CognitoIdentityProviderClient;
+export class CognitoAuthProvider extends BaseAuthProvider {  private environmentService = inject(EnvironmentService);
+  
+  private cognitoClient!: CognitoIdentityProviderClient;
   private config: CognitoConfig;
   private accessToken: string | null = null;
-  private refreshToken: string | null = null;  constructor(private environmentService: EnvironmentService) {
+  private refreshToken: string | null = null;
+
+  constructor() {
     super();
     const envConfig = this.environmentService.cognito;
     this.config = {

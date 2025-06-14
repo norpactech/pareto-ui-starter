@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, from, throwError } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import { Router } from '@angular/router';
@@ -16,7 +16,9 @@ import {
   DeleteUserCommand,
   GlobalSignOutCommand,
   AuthFlowType,
-  AttributeType
+  AttributeType,
+  GetUserResponse,
+  AuthenticationResultType
 } from '@aws-sdk/client-cognito-identity-provider';
 import { environment } from '../../../environments/environment';
 
@@ -68,10 +70,11 @@ export class CognitoAuthService {
     idToken: null,
     refreshToken: null
   });
-
   public authState$ = this.authStateSubject.asObservable();
 
-  constructor(private router: Router) {
+  private router = inject(Router);
+
+  constructor() {
     this.initializeCognito();
     this.checkAuthState();
   }
@@ -416,10 +419,10 @@ export class CognitoAuthService {
       })
     );
   }
-
   /**
    * Get current user information
-   */  getCurrentUser(): Observable<any> {
+   */
+  getCurrentUser(): Observable<GetUserResponse> {
     const accessToken = this.authStateSubject.value.accessToken;
     console.log('getCurrentUser called, accessToken available:', !!accessToken);
     
@@ -507,14 +510,16 @@ export class CognitoAuthService {
         return throwError(() => error);
       })
     );
-  }
-  /**
+  }  /**
    * Handle successful authentication
-   */
-  private handleSuccessfulAuth(username: string, authResult: any, rememberMe: boolean): void {
+   */  private handleSuccessfulAuth(username: string, authResult: AuthenticationResultType, rememberMe: boolean): void {
     const accessToken = authResult.AccessToken;
     const idToken = authResult.IdToken;
     const refreshToken = authResult.RefreshToken;
+
+    if (!accessToken || !idToken || !refreshToken) {
+      throw new Error('Missing required tokens in authentication result');
+    }
 
     // Store tokens
     this.storeTokens(accessToken, idToken, refreshToken, rememberMe);
@@ -533,16 +538,14 @@ export class CognitoAuthService {
     // Get user information
     this.getCurrentUser().subscribe({
       next: (userResponse) => {
-        const userAttributes: Record<string, any> = {};
+        const userAttributes: Record<string, string | number | boolean> = {};
         userResponse.UserAttributes?.forEach((attr: AttributeType) => {
           if (attr.Name && attr.Value) {
             userAttributes[attr.Name] = attr.Value;
           }
-        });
-
-        const user: CognitoUser = {
+        });        const user: CognitoUser = {
           username: userResponse.Username || username,
-          email: userAttributes['email'] || '',
+          email: String(userAttributes['email'] || ''),
           attributes: userAttributes
         };
 
@@ -631,14 +634,14 @@ export class CognitoAuthService {
   private updateAuthState(updates: Partial<CognitoAuthState>): void {
     const currentState = this.authStateSubject.value;
     this.authStateSubject.next({ ...currentState, ...updates });
-  }
-
-  /**
+  }  /**
    * Get readable error message
    */
-  private getErrorMessage(error: any): string {
-    if (error.name) {
-      switch (error.name) {
+  private getErrorMessage(error: unknown): string {
+    // Type guard to check if error has expected properties
+    if (error && typeof error === 'object' && 'name' in error) {
+      const errorName = (error as { name: string }).name;
+      switch (errorName) {
         case 'UserNotFoundException':
           return 'User not found';
         case 'NotAuthorizedException':
@@ -660,14 +663,26 @@ export class CognitoAuthService {
         case 'TooManyRequestsException':
           return 'Too many requests, please try again later';
         case 'PasswordResetRequiredException':
-          return 'Password reset required';
-        case 'UserLambdaValidationException':
+          return 'Password reset required';        case 'UserLambdaValidationException':
           return 'User validation failed';
-        default:
-          return error.message || `Authentication error: ${error.name}`;
+        default: {
+          const message = 'message' in error ? String((error as { message: unknown }).message) : '';
+          return message || `Authentication error: ${errorName}`;
+        }
       }
     }
-    return error.message || 'Unknown authentication error';
+    
+    // Handle string errors
+    if (typeof error === 'string') {
+      return error;
+    }
+    
+    // Handle Error objects
+    if (error instanceof Error) {
+      return error.message;
+    }
+    
+    return 'Unknown authentication error';
   }
 
   // Getters for current state
