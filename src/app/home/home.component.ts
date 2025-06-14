@@ -3,12 +3,15 @@
  * Licensed under the MIT License.
  */
 
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
+import { Subject, Observable } from 'rxjs';
+import { takeUntil, map } from 'rxjs/operators';
+import { CognitoAuthService } from '../auth/services/cognito-auth.service';
 
 @Component({
   selector: 'app-home',
@@ -23,6 +26,21 @@ import { MatIconModule } from '@angular/material/icon';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
-export class HomeComponent {
-  
+export class HomeComponent implements OnInit, OnDestroy {
+  isAuthenticated$: Observable<boolean>;
+  private destroy$ = new Subject<void>();
+  constructor(private cognitoAuth: CognitoAuthService) {
+    this.isAuthenticated$ = this.cognitoAuth.authState$.pipe(
+      map(state => state.isAuthenticated)
+    );
+  }
+
+  ngOnInit(): void {
+    // Component initialization if needed
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
 }

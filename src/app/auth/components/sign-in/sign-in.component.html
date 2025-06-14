@@ -47,11 +47,9 @@
         </button>      </div>      <div class="field-error" *ngIf="isFieldInvalid('password')">
         {{ getFieldError('password') }}
       </div>
-    </div>
-
-    <!-- Remember Me & Forgot Password -->
+    </div>    <!-- Remember Me & Forgot Password -->
     <div class="form-options">
-      <label class="checkbox-container">
+      <label class="checkbox-container" title="Keep me signed in on this device">
         <input type="checkbox" formControlName="rememberMe">
         <span class="checkmark"></span>
         <span class="checkbox-label">Remember me</span>

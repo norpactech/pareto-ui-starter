@@ -97,15 +97,15 @@ export class CognitoAuthService {
       region: this.cognitoConfig.region
     });
   }
-
   /**
-   * Check current authentication state from localStorage
+   * Check current authentication state from localStorage and sessionStorage
    */
   private checkAuthState(): void {
-    const accessToken = localStorage.getItem('cognito_access_token');
-    const idToken = localStorage.getItem('cognito_id_token');
-    const refreshToken = localStorage.getItem('cognito_refresh_token');
-    const userData = localStorage.getItem('cognito_user');
+    // Check both localStorage and sessionStorage for tokens
+    let accessToken = localStorage.getItem('cognito_access_token') || sessionStorage.getItem('cognito_access_token');
+    let idToken = localStorage.getItem('cognito_id_token') || sessionStorage.getItem('cognito_id_token');
+    let refreshToken = localStorage.getItem('cognito_refresh_token') || sessionStorage.getItem('cognito_refresh_token');
+    let userData = localStorage.getItem('cognito_user') || sessionStorage.getItem('cognito_user');
 
     if (accessToken && idToken && userData) {
       try {
@@ -230,11 +230,10 @@ export class CognitoAuthService {
       })
     );
   }
-
   /**
    * Sign in user
    */
-  signIn(username: string, password: string): Observable<any> {
+  signIn(username: string, password: string, rememberMe: boolean = false): Observable<any> {
     this.updateAuthState({ loading: true, error: null });
 
     const command = new InitiateAuthCommand({
@@ -257,7 +256,7 @@ export class CognitoAuthService {
         } else if (response.AuthenticationResult) {
           // Successful authentication
           const authResult = response.AuthenticationResult;
-          this.handleSuccessfulAuth(username, authResult);
+          this.handleSuccessfulAuth(username, authResult, rememberMe);
         }
       }),
       catchError(error => {
@@ -512,17 +511,15 @@ export class CognitoAuthService {
   /**
    * Handle successful authentication
    */
-  private handleSuccessfulAuth(username: string, authResult: any): void {
+  private handleSuccessfulAuth(username: string, authResult: any, rememberMe: boolean): void {
     const accessToken = authResult.AccessToken;
     const idToken = authResult.IdToken;
     const refreshToken = authResult.RefreshToken;
 
     // Store tokens
-    localStorage.setItem('cognito_access_token', accessToken);
-    localStorage.setItem('cognito_id_token', idToken);
-    if (refreshToken) {
-      localStorage.setItem('cognito_refresh_token', refreshToken);
-    }    // Update auth state with tokens immediately
+    this.storeTokens(accessToken, idToken, refreshToken, rememberMe);
+
+    // Update auth state with tokens immediately
     this.updateAuthState({
       ...this.authStateSubject.value,
       accessToken,
@@ -550,7 +547,7 @@ export class CognitoAuthService {
         };
 
         // Store user data
-        localStorage.setItem('cognito_user', JSON.stringify(user));
+        this.storeUserData(user, rememberMe);
 
         this.updateAuthState({
           isAuthenticated: true,
@@ -586,13 +583,46 @@ export class CognitoAuthService {
   }
 
   /**
-   * Clear stored authentication data
+   * Storage utility methods for Remember Me functionality
    */
-  private clearStoredAuth(): void {
-    localStorage.removeItem('cognito_access_token');
-    localStorage.removeItem('cognito_id_token');
-    localStorage.removeItem('cognito_refresh_token');
-    localStorage.removeItem('cognito_user');
+  private getStorage(rememberMe: boolean): Storage {
+    return rememberMe ? localStorage : sessionStorage;
+  }
+
+  private storeTokens(accessToken: string, idToken: string, refreshToken: string | undefined, rememberMe: boolean): void {
+    const storage = this.getStorage(rememberMe);
+    
+    storage.setItem('cognito_access_token', accessToken);
+    storage.setItem('cognito_id_token', idToken);
+    if (refreshToken) {
+      storage.setItem('cognito_refresh_token', refreshToken);
+    }
+    
+    // Also store the rememberMe preference for future reference
+    storage.setItem('cognito_remember_me', rememberMe.toString());
+  }
+
+  private storeUserData(user: CognitoUser, rememberMe: boolean): void {
+    const storage = this.getStorage(rememberMe);
+    storage.setItem('cognito_user', JSON.stringify(user));
+  }
+
+  private clearStoredTokens(): void {
+    // Clear from both storages to ensure clean logout
+    ['localStorage', 'sessionStorage'].forEach(storageType => {
+      const storage = storageType === 'localStorage' ? localStorage : sessionStorage;
+      storage.removeItem('cognito_access_token');
+      storage.removeItem('cognito_id_token');
+      storage.removeItem('cognito_refresh_token');
+      storage.removeItem('cognito_user');
+      storage.removeItem('cognito_remember_me');
+    });
+  }
+
+  /**
+   * Clear stored authentication data
+   */  private clearStoredAuth(): void {
+    this.clearStoredTokens();
   }
 
   /**

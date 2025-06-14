@@ -50,14 +50,14 @@ export class SignInComponent implements OnInit, OnDestroy {
         this.error = state.error;
       });
   }
-
   onSubmit(): void {
     if (this.signInForm.valid) {
       const formValue = this.signInForm.value;
       const username = formValue.email.trim().toLowerCase();
       const password = formValue.password;
+      const rememberMe = formValue.rememberMe || false;
 
-      this.cognitoAuth.signIn(username, password)
+      this.cognitoAuth.signIn(username, password, rememberMe)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
