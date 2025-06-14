@@ -63,9 +63,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
         this.loading = state.loading;
         this.error = state.error;
       });
-  }
-
-  // Custom password validator for Cognito password policy
+  }  // Custom password validator for Cognito password policy
   private passwordValidator(control: any) {
     const password = control.value;
     if (!password) return null;
@@ -73,9 +71,10 @@ export class SignUpComponent implements OnInit, OnDestroy {
     const hasNumber = /[0-9]/.test(password);
     const hasUpper = /[A-Z]/.test(password);
     const hasLower = /[a-z]/.test(password);
+    const hasSpecial = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
     const minLength = password.length >= 8;
 
-    const passwordValid = hasNumber && hasUpper && hasLower && minLength;
+    const passwordValid = hasNumber && hasUpper && hasLower && hasSpecial && minLength;
 
     if (!passwordValid) {
       return {
@@ -83,6 +82,7 @@ export class SignUpComponent implements OnInit, OnDestroy {
           hasNumber,
           hasUpper,
           hasLower,
+          hasSpecial,
           minLength
         }
       };
@@ -205,17 +205,16 @@ export class SignUpComponent implements OnInit, OnDestroy {
     
     return '';
   }
-
   private getPasswordPolicyError(policyError: any): string {
     const requirements = [];
     if (!policyError.minLength) requirements.push('at least 8 characters');
     if (!policyError.hasNumber) requirements.push('at least 1 number');
     if (!policyError.hasUpper) requirements.push('at least 1 uppercase letter');
     if (!policyError.hasLower) requirements.push('at least 1 lowercase letter');
+    if (!policyError.hasSpecial) requirements.push('at least 1 special character');
     
     return `Password must contain ${requirements.join(', ')}`;
   }
-
   getPasswordRequirement(requirement: string): boolean {
     const passwordControl = this.signUpForm.get('password');
     if (!passwordControl || !passwordControl.value) return false;
@@ -231,10 +230,12 @@ export class SignUpComponent implements OnInit, OnDestroy {
         return /[A-Z]/.test(password);
       case 'hasLower':
         return /[a-z]/.test(password);
+      case 'hasSpecial':
+        return /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(password);
       default:
         return false;
     }
-  }  private getFieldDisplayName(fieldName: string): string {
+  }private getFieldDisplayName(fieldName: string): string {
     const displayNames: { [key: string]: string } = {
       email: 'Email',
       password: 'Password',
@@ -256,5 +257,13 @@ export class SignUpComponent implements OnInit, OnDestroy {
   backToSignUp(): void {
     this.showVerification = false;
     this.error = null;
+  }
+
+  areAllPasswordRequirementsMet(): boolean {
+    return this.getPasswordRequirement('minLength') &&
+           this.getPasswordRequirement('hasNumber') &&
+           this.getPasswordRequirement('hasUpper') &&
+           this.getPasswordRequirement('hasLower') &&
+           this.getPasswordRequirement('hasSpecial');
   }
 }

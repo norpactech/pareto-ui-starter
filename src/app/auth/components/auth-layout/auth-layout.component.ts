@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router } from '@angular/router';
 
 @Component({
   selector: 'app-auth-layout',
@@ -10,4 +10,23 @@ import { RouterOutlet } from '@angular/router';
 })
 export class AuthLayoutComponent {
 
+  constructor(private router: Router) {}
+
+  getFormTitle(): string {
+    const url = this.router.url;
+    
+    if (url.includes('signin')) {
+      return 'Sign In';
+    } else if (url.includes('signup')) {
+      return 'Sign Up';
+    } else if (url.includes('forgot-password')) {
+      return 'Forgot Password';
+    } else if (url.includes('reset-password')) {
+      return 'Reset Password';
+    } else if (url.includes('verify-email')) {
+      return 'Verify Email';
+    } else {
+      return 'Authentication';
+    }
+  }
 }

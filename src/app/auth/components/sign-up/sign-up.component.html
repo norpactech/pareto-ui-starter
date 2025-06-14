@@ -1,17 +1,12 @@
 <div class="sign-up-container">
-  <!-- Sign Up Form -->
-  <div *ngIf="!showVerification" class="form-section">    <div class="form-header">
-      <h2>Create Account</h2>
-      <p>Enter your email and password to get started</p>
-    </div>
-
+  <!-- Sign Up Form -->  <div *ngIf="!showVerification" class="form-section">
     <!-- Error Alert -->
     <div class="alert alert-error" *ngIf="error">
       <span class="material-icons icon-error">warning</span>
       <span>{{ error }}</span>
     </div>
 
-    <form [formGroup]="signUpForm" (ngSubmit)="onSignUp()" class="auth-form">      <!-- Email Field -->
+    <form [formGroup]="signUpForm" (ngSubmit)="onSignUp()" class="auth-form"><!-- Email Field -->
       <div class="form-group">
         <label for="email" class="form-label">Email Address</label>
         <div class="input-container">
@@ -56,27 +51,28 @@
         </div>
         <div class="field-error" *ngIf="isFieldInvalid(signUpForm, 'password')">
           {{ getFieldError(signUpForm, 'password') }}
-        </div>
-
-        <!-- Password Requirements -->
-        <div class="password-requirements" *ngIf="signUpForm.get('password')?.touched">
+        </div>        <!-- Password Requirements -->
+        <div class="password-requirements" [class.all-requirements-met]="areAllPasswordRequirementsMet()">
           <div class="requirements-title">Password must contain:</div>
           <div class="requirement-list">
-            <div class="requirement-item" [class.met]="getPasswordRequirement('minLength')">
+            <div class="requirement-item" [class.met]="getPasswordRequirement('minLength')" [class.hide-when-met]="getPasswordRequirement('minLength')">>
               <span class="material-icons">{{ getPasswordRequirement('minLength') ? 'check_circle' : 'radio_button_unchecked' }}</span>
               At least 8 characters
             </div>
-            <div class="requirement-item" [class.met]="getPasswordRequirement('hasNumber')">
+            <div class="requirement-item" [class.met]="getPasswordRequirement('hasNumber')" [class.hide-when-met]="getPasswordRequirement('hasNumber')">>
               <span class="material-icons">{{ getPasswordRequirement('hasNumber') ? 'check_circle' : 'radio_button_unchecked' }}</span>
               At least 1 number
             </div>
-            <div class="requirement-item" [class.met]="getPasswordRequirement('hasUpper')">
+            <div class="requirement-item" [class.met]="getPasswordRequirement('hasUpper')" [class.hide-when-met]="getPasswordRequirement('hasUpper')">>
               <span class="material-icons">{{ getPasswordRequirement('hasUpper') ? 'check_circle' : 'radio_button_unchecked' }}</span>
               At least 1 uppercase letter
-            </div>
-            <div class="requirement-item" [class.met]="getPasswordRequirement('hasLower')">
+            </div>            <div class="requirement-item" [class.met]="getPasswordRequirement('hasLower')" [class.hide-when-met]="getPasswordRequirement('hasLower')">>
               <span class="material-icons">{{ getPasswordRequirement('hasLower') ? 'check_circle' : 'radio_button_unchecked' }}</span>
               At least 1 lowercase letter
+            </div>
+            <div class="requirement-item" [class.met]="getPasswordRequirement('hasSpecial')" [class.hide-when-met]="getPasswordRequirement('hasSpecial')">>
+              <span class="material-icons">{{ getPasswordRequirement('hasSpecial') ? 'check_circle' : 'radio_button_unchecked' }}</span>
+              At least 1 special character (!&#64;#$%^&*...)
             </div>
           </div>
         </div>
@@ -134,13 +130,7 @@
     </div>
   </div>
 
-  <!-- Email Verification Section -->
-  <div *ngIf="showVerification" class="verification-section">
-    <div class="form-header">
-      <h2>Verify Your Email</h2>
-      <p>We've sent a verification code to <strong>{{ codeDeliveryDestination }}</strong></p>
-    </div>
-
+  <!-- Email Verification Section -->  <div *ngIf="showVerification" class="verification-section">
     <!-- Error Alert -->
     <div class="alert alert-error" *ngIf="error">
       <span class="material-icons icon-error">warning</span>
