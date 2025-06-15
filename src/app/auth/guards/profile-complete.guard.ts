@@ -23,20 +23,18 @@ export class ProfileCompleteGuard implements CanActivate {
   private checkProfileComplete(url: string): Observable<boolean> {
     return this.cognitoAuth.authState$.pipe(
       take(1),
-      switchMap(authState => {
+      switchMap(authState => {        
         if (!authState.isAuthenticated) {
-          // Not authenticated, redirect to login
           localStorage.setItem('redirectUrl', url);
           this.router.navigate(['/auth/signin']);
           return [false];
         }
-
-        // Check if user profile exists in our database
-        return this.userService.checkUserProfile(authState.user?.email || '').pipe(
+        const params: Record<string, unknown> = {
+          email: authState.user?.email
+        };
+        return this.userService.find(params).pipe(
           map(userProfile => {
             if (!userProfile) {
-              // No profile found, redirect to complete profile page
-              // Don't store redirect URL for complete-profile page itself
               if (url !== '/complete-profile') {
                 localStorage.setItem('redirectUrl', url);
               }

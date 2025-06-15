@@ -8,7 +8,7 @@ import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil } from 'rxjs';
-import { UserService } from '../../services/user.service';
+import { UserService } from '../../../shared/services/user.service';
 import { User } from '../../../shared/models/user.models';
 import { UserProfileComponent } from '../user-profile/user-profile.component';
 

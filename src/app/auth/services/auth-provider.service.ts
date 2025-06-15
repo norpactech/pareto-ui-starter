@@ -11,7 +11,7 @@ import {
   PasswordChangeRequest
 } from '../interfaces/auth-provider.interface';
 import { CognitoAuthProvider } from '../providers/cognito-auth.provider';
-import { EnvironmentService } from '../../shared/services/environment.service';
+import { EnvironmentService } from '@shared/services';
 
 @Injectable({
   providedIn: 'root'

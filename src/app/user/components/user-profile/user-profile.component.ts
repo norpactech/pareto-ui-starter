@@ -9,8 +9,8 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { Subject, takeUntil } from 'rxjs';
-import { UserService } from '../../services/user.service';
-import { User, UpdateUserRequest } from '../../../shared/models/user.models';
+import { UserService } from '@shared/services';
+import { IUser, UpdateUserRequest } from '@shared/models';
 
 @Component({
   selector: 'app-user-profile',

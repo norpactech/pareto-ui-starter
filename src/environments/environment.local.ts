@@ -4,10 +4,11 @@
  */
 
 export const environment = {
+  environmentName: 'local',
   production: false,
   development: true,
-  environmentName: 'local',  apiUrl: 'http://localhost:3000/api',
-  wsUrl: 'ws://localhost:3000',
+  apiUrl: 'https://api-dev.northernpacifictech.com/api',
+  wsUrl: 'wss://api-dev.northernpacifictech.com',
   enableLogging: true,
   enableDebugInfo: true,
   logLevel: 'debug',

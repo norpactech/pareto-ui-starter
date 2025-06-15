@@ -29,7 +29,7 @@ import {
   AuthError,
   AuthErrorType
 } from '../interfaces/auth-provider.interface';
-import { EnvironmentService } from '../../shared/services/environment.service';
+import { EnvironmentService } from '@shared/services';
 
 export interface CognitoConfig {
   region: string;
