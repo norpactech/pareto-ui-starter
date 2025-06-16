@@ -347,8 +347,7 @@
     padding: 8px 0;
   }
 
-  .menu-list {
-    .menu-item {
+  .menu-list {    .menu-item {
       display: flex;
       align-items: center;
       padding: 12px 20px;
@@ -357,10 +356,12 @@
       transition: var(--transition);
       border-left: 3px solid transparent;
       min-height: 48px;
+      cursor: pointer !important;
 
       &:hover {
         background: var(--primary-50);
         border-left-color: var(--primary-500);
+        cursor: pointer !important;
       }
 
       .menu-icon {
@@ -376,20 +377,33 @@
       .menu-text {
         font-weight: 400;
         font-size: 14px;
-      }
-
-      &.logout {
+      }      &.logout {
         border-top: 1px solid var(--surface-200);
         margin-top: 8px;
         color: var(--text-secondary);
+        cursor: pointer !important;
+        background: none;
+        border-left: none;
+        border-right: none;
+        border-bottom: none;
+        text-align: left;
+        width: 100%;
+        font-family: inherit;
+        font-size: inherit;
+        outline: none;
 
         &:hover {
           background: #ffebee;
           border-left-color: #f44336;
+          cursor: pointer !important;
           
           .menu-icon {
             color: #f44336;
           }
+        }
+
+        &:focus {
+          outline: none;
         }
       }
     }

@@ -62,8 +62,7 @@
         <span class="menu-icon material-icons">home</span>
         <span class="menu-text">Home</span>
       </a>
-      
-      <!-- Authenticated User Menu Items -->
+        <!-- Authenticated User Menu Items -->
       <ng-container *ngIf="isAuthenticated">        <a routerLink="/dashboard" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
           <span class="menu-icon material-icons">dashboard</span>
           <span class="menu-text">Dashboard</span>
@@ -71,49 +70,20 @@
           <span class="menu-icon material-icons">person</span>
           <span class="menu-text">Profile</span>
         </a>
-        <a href="#" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
-          <span class="menu-icon material-icons">settings</span>
-          <span class="menu-text">Settings</span>
-        </a>
-        <a href="#" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
-          <span class="menu-icon material-icons">folder</span>
-          <span class="menu-text">Projects</span>
-        </a>
-        <a href="#" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
-          <span class="menu-icon material-icons">group</span>
-          <span class="menu-text">Team</span>
-        </a>
         <a routerLink="/users" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
           <span class="menu-icon material-icons">manage_accounts</span>
           <span class="menu-text">User Management</span>
-        </a>
-        <a href="#" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
-          <span class="menu-icon material-icons">analytics</span>
-          <span class="menu-text">Reports</span>
-        </a>        <a routerLink="/help" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
+        </a>        
+        <a routerLink="/help" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
           <span class="menu-icon material-icons">help</span>
           <span class="menu-text">Help</span>
         </a>
-      </ng-container>        <!-- Unauthenticated User Menu Items -->      <ng-container *ngIf="!isAuthenticated">
-        <a routerLink="/auth/signin" class="menu-item mat-list-item" (click)="closeMenu()">
-          <span class="menu-icon material-icons">login</span>
-          <span class="menu-text">Sign In</span>
-        </a>
-        <a routerLink="/auth/signup" class="menu-item mat-list-item" (click)="closeMenu()">
-          <span class="menu-icon material-icons">person_add</span>
-          <span class="menu-text">Sign Up</span>
-        </a>
-        <a routerLink="/help" class="menu-item mat-list-item" (click)="closeMenu()">
-          <span class="menu-icon material-icons">help</span>
-          <span class="menu-text">Help</span>
+        <a routerLink="/home" class="menu-item mat-list-item" (click)="signOut()">
+          <span class="menu-icon material-icons">logout</span>
+          <span class="menu-text">logout</span>
         </a>
       </ng-container>
-    </div>
-      <div class="menu-footer" *ngIf="isAuthenticated">      <a class="menu-item mat-list-item logout" (click)="signOut()" (keydown.enter)="signOut()" (keydown.space)="signOut()" tabindex="0" role="button">
-        <span class="menu-icon material-icons">logout</span>
-        <span class="menu-text">Logout</span>
-      </a>
-    </div>
+    </div>      
   </div>
 </nav>
 

@@ -65,10 +65,11 @@ export class AppComponent implements OnInit {
       // Check profile status when authentication state changes
       if (authState.isAuthenticated && authState.user?.email) {
         console.log('AppComponent: User authenticated, checking profile for:', authState.user.email);
-        this.checkUserProfile(authState.user.email);
-      } else {
+        this.checkUserProfile(authState.user.email);      } else {
         console.log('AppComponent: User not authenticated or no email, setting hasProfile = false');
         this.hasProfile = false;
+        // Close menu when user is not authenticated
+        this.isMenuOpen = false;
       }
     });
   }
@@ -145,29 +146,32 @@ export class AppComponent implements OnInit {
         console.log('AppComponent: Profile check result:', result);
         // Check if any user profile exists
         const userProfile = result.data && result.data.length > 0 ? result.data[0] : null;
-        
-        if (!userProfile) {
+          if (!userProfile) {
           console.log('AppComponent: No profile found');
           this.hasProfile = false;
+          this.isMenuOpen = false; // Close menu when no profile
           return;
         }
         
         // Verify that the returned profile actually matches the authenticated user's email
         const authenticatedEmail = email.toLowerCase();
         const profileEmail = userProfile.email?.toLowerCase();
-        
-        if (authenticatedEmail !== profileEmail) {
+          if (authenticatedEmail !== profileEmail) {
           console.warn('AppComponent: Email mismatch detected - auth:', authenticatedEmail, 'profile:', profileEmail);
           this.hasProfile = false;
+          this.isMenuOpen = false; // Close menu on email mismatch
           return;
         }
-        
-        console.log('AppComponent: Profile found and verified, setting hasProfile = true');
+          console.log('AppComponent: Profile found and verified, setting hasProfile = true');
         this.hasProfile = true;
-      },
-      error: (error) => {
+        
+        // Automatically show the hamburger menu when user is authenticated with profile
+        console.log('AppComponent: Auto-opening menu for authenticated user with profile');
+        this.isMenuOpen = true;
+      },      error: (error) => {
         console.error('Error checking user profile:', error);
         this.hasProfile = false;
+        this.isMenuOpen = false; // Close menu on error
       }
     });
   }
