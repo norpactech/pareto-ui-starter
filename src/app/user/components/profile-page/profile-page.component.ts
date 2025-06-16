@@ -31,10 +31,6 @@ import { take, switchMap, map } from 'rxjs/operators';
         </mat-card>
       </div>      <!-- Profile creation form (when no profile exists) -->
       <div *ngIf="!isLoading && !hasProfile" class="profile-creation-container">
-        <div class="header-section">
-          <h1>Complete Your Profile</h1>
-          <p>Please fill in your profile information to get started.</p>
-        </div>
         <app-user-profile 
           (profileSaved)="onProfileCreated($event)"
           (cancelled)="onProfileCancelled()">

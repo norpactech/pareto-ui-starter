@@ -3,12 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
-import { MatButtonModule } from '@angular/material/button';
-import { MatIconModule } from '@angular/material/icon';
-import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { MatCardModule } from '@angular/material/card';
 import { Router } from '@angular/router';
 import { Subject, takeUntil, take, switchMap } from 'rxjs';
 import { UserService } from '@shared/services';
@@ -22,13 +16,7 @@ import { CognitoAuthService } from '../../../auth/services/cognito-auth.service'
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
-    MatSnackBarModule,
-    MatButtonModule,
-    MatIconModule,
-    MatFormFieldModule,
-    MatInputModule,
-    MatProgressSpinnerModule,
-    MatCardModule
+    MatSnackBarModule
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss'
@@ -54,7 +42,7 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      phone: ['', [Validators.required, Validators.pattern(/^\+?[\d\s-()]+$/)]],
+      phone: ['', [Validators.required, Validators.pattern(/^\d{3}-\d{3}-\d{4}$/)]],
       street1: ['', [Validators.required, Validators.minLength(5)]],
       street2: [''],
       city: ['', [Validators.required, Validators.minLength(2)]],
@@ -71,6 +59,43 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
+
+  formatPhoneNumber(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    let value = input.value.replace(/\D/g, ''); // Remove all non-digits
+    
+    // Limit to 10 digits
+    value = value.substring(0, 10);
+    
+    // Format as ###-###-####
+    if (value.length >= 6) {
+      value = `${value.substring(0, 3)}-${value.substring(3, 6)}-${value.substring(6)}`;
+    } else if (value.length >= 3) {
+      value = `${value.substring(0, 3)}-${value.substring(3)}`;
+    }
+    
+    // Update the form control value
+    this.profileForm.get('phone')?.setValue(value, { emitEvent: false });
+    
+    // Update the input display value
+    input.value = value;
+  }
+
+  private formatPhoneForDisplay(phone: string): string {
+    if (!phone) return '';
+    
+    // Remove all non-digits
+    const digits = phone.replace(/\D/g, '');
+    
+    // Format as ###-###-####
+    if (digits.length === 10) {
+      return `${digits.substring(0, 3)}-${digits.substring(3, 6)}-${digits.substring(6)}`;
+    }
+    
+    // Return original if not 10 digits
+    return phone;
+  }
+
   private loadCurrentUser(): void {
     this.isLoading = true;
     
@@ -87,13 +112,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     ).subscribe({
       next: (result) => {
         const user = result.data && result.data.length > 0 ? result.data[0] : null;
-        this.currentUser = user;
-        if (user) {
+        this.currentUser = user;        if (user) {
           this.profileForm.patchValue({
             firstName: user.firstName,
             lastName: user.lastName,
             email: user.email,
-            phone: user.phone,
+            phone: this.formatPhoneForDisplay(user.phone),
             street1: user.street1,
             street2: user.street2,
             city: user.city,
@@ -232,10 +256,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     if (control?.hasError('minlength')) {
       const minLengthError = control.errors?.['minlength'] as { requiredLength?: number };
       return `${this.getFieldDisplayName(fieldName)} must be at least ${minLengthError?.requiredLength || 2} characters`;
-    }
-    if (control?.hasError('pattern')) {
+    }    if (control?.hasError('pattern')) {
       if (fieldName === 'phone') {
-        return 'Please enter a valid phone number';
+        return 'Please enter a valid phone number (e.g., 555-123-4567)';
       }
       if (fieldName === 'zipCode') {
         return 'Please enter a valid ZIP code (e.g., 12345 or 12345-6789)';

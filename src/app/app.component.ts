@@ -13,6 +13,8 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ThemeService } from './shared/services/theme.service';
 import { CognitoAuthService, CognitoAuthState, CognitoUser } from './auth/services/cognito-auth.service';
 import { UserProfileComponent } from './user/components/user-profile/user-profile.component';
+import { UserService } from './shared/services/user.service';
+import { User } from './shared/models/user.dto';
 
 @Component({
   selector: 'app-root',
@@ -24,10 +26,12 @@ export class AppComponent implements OnInit {
   private themeService = inject(ThemeService);
   private cognitoAuth = inject(CognitoAuthService);
   private dialog = inject(MatDialog);
+  private userService = inject(UserService);
 
   title = 'Pareto UI Starter';
   isMenuOpen = false;
   isDarkTheme = false;
+  hasProfile = false;
   authState: CognitoAuthState = {
     isAuthenticated: false,
     user: null,
@@ -37,9 +41,14 @@ export class AppComponent implements OnInit {
     idToken: null,
     refreshToken: null
   };
-
   get isAuthenticated(): boolean {
     return this.authState.isAuthenticated;
+  }
+
+  get isAuthenticatedWithProfile(): boolean {
+    const result = this.authState.isAuthenticated && this.hasProfile;
+    console.log('AppComponent: isAuthenticatedWithProfile check - isAuthenticated:', this.authState.isAuthenticated, 'hasProfile:', this.hasProfile, 'result:', result);
+    return result;
   }
 
   get currentUser(): CognitoUser | null {
@@ -50,7 +59,17 @@ export class AppComponent implements OnInit {
       this.isDarkTheme = theme === 'dark';
     });    // Subscribe to authentication state
     this.cognitoAuth.authState$.subscribe(authState => {
+      console.log('AppComponent: Auth state changed:', authState);
       this.authState = authState;
+      
+      // Check profile status when authentication state changes
+      if (authState.isAuthenticated && authState.user?.email) {
+        console.log('AppComponent: User authenticated, checking profile for:', authState.user.email);
+        this.checkUserProfile(authState.user.email);
+      } else {
+        console.log('AppComponent: User not authenticated or no email, setting hasProfile = false');
+        this.hasProfile = false;
+      }
     });
   }
 
@@ -60,6 +79,21 @@ export class AppComponent implements OnInit {
 
   closeMenu() {
     this.isMenuOpen = false;
+  }
+
+  // Close menu conditionally - only for unauthenticated users or mobile devices
+  closeMenuConditionally() {
+    // Always close for unauthenticated users
+    if (!this.isAuthenticated) {
+      this.closeMenu();
+      return;
+    }
+    
+    // For authenticated users, only close on mobile/tablet
+    if (window.innerWidth <= 767) {
+      this.closeMenu();
+    }
+    // On desktop, keep menu open for authenticated users
   }
 
   // Close menu only on mobile/tablet when clicking overlay
@@ -97,6 +131,40 @@ export class AppComponent implements OnInit {
       error: (error) => {
         console.error('Sign out error:', error);
         this.closeMenu();
+      }
+    });
+  }
+  private checkUserProfile(email: string): void {
+    console.log('AppComponent: Checking profile for email:', email);
+    const params = { email: email };
+    this.userService.find(params).subscribe({
+      next: (result: { data: User[]; total: number }) => {
+        console.log('AppComponent: Profile check result:', result);
+        // Check if any user profile exists
+        const userProfile = result.data && result.data.length > 0 ? result.data[0] : null;
+        
+        if (!userProfile) {
+          console.log('AppComponent: No profile found');
+          this.hasProfile = false;
+          return;
+        }
+        
+        // Verify that the returned profile actually matches the authenticated user's email
+        const authenticatedEmail = email.toLowerCase();
+        const profileEmail = userProfile.email?.toLowerCase();
+        
+        if (authenticatedEmail !== profileEmail) {
+          console.warn('AppComponent: Email mismatch detected - auth:', authenticatedEmail, 'profile:', profileEmail);
+          this.hasProfile = false;
+          return;
+        }
+        
+        console.log('AppComponent: Profile found and verified, setting hasProfile = true');
+        this.hasProfile = true;
+      },
+      error: (error) => {
+        console.error('Error checking user profile:', error);
+        this.hasProfile = false;
       }
     });
   }
