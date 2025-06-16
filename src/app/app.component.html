@@ -67,8 +67,7 @@
       <ng-container *ngIf="isAuthenticated">        <a routerLink="/dashboard" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
           <span class="menu-icon material-icons">dashboard</span>
           <span class="menu-text">Dashboard</span>
-        </a>
-        <a href="#" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
+        </a>        <a routerLink="/users/profile" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
           <span class="menu-icon material-icons">person</span>
           <span class="menu-text">Profile</span>
         </a>

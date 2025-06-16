@@ -6,12 +6,22 @@
       <p>Loading profile...</p>
     </div>
   </div>
-
   <!-- Profile form -->
   <div *ngIf="!isLoading" class="profile-form-container">
     <div class="form-header">
-      <h2>{{ currentUser ? 'Edit Profile' : 'Create Your Profile' }}</h2>
-      <p>{{ currentUser ? 'Update your profile information below.' : 'Please fill in your profile information to get started.' }}</p>
+      <div class="header-content">
+        <h2>{{ currentUser ? 'Edit Profile' : 'Create Your Profile' }}</h2>
+        <p>{{ currentUser ? 'Update your profile information below.' : 'Please fill in your profile information to get started.' }}</p>
+      </div>
+      <button 
+        type="button" 
+        class="close-btn" 
+        (click)="onCancel()" 
+        aria-label="Close profile form"
+        title="Close"
+      >
+        <span class="material-icons">close</span>
+      </button>
     </div>
 
     <form [formGroup]="profileForm" (ngSubmit)="onSave()" class="auth-form">
@@ -191,9 +201,7 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- Form Actions -->
+      </div>      <!-- Form Actions -->
       <div class="form-actions">
         <button
           type="submit"

@@ -27,6 +27,7 @@ export interface IUser {
 export type User = IUser;
 
 export interface UpdateUserRequest {
+  id?: string
   email: string
   firstName: string
   lastName: string
@@ -36,4 +37,6 @@ export interface UpdateUserRequest {
   city?: string
   state?: string
   zipCode?: string
+  updatedAt?: Date
+  updatedBy?: string
 }

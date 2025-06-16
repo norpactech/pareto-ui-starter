@@ -34,21 +34,61 @@
 
 .profile-form-container {
   .form-header {
-    text-align: center;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
     margin-bottom: 2.5rem;
+    position: relative;
 
-    h2 {
-      margin: 0 0 0.5rem 0;
-      color: var(--text-primary);
-      font-weight: 500;
-      font-size: 1.875rem;
+    .header-content {
+      flex: 1;
+      text-align: center;
+      
+      h2 {
+        margin: 0 0 0.5rem 0;
+        color: var(--text-primary);
+        font-weight: 500;
+        font-size: 1.875rem;
+      }
+
+      p {
+        margin: 0;
+        color: var(--text-secondary);
+        font-size: 1rem;
+        line-height: 1.5;
+      }
     }
 
-    p {
-      margin: 0;
+    .close-btn {
+      position: absolute;
+      top: 0;
+      right: 0;
+      background: none;
+      border: none;
       color: var(--text-secondary);
-      font-size: 1rem;
-      line-height: 1.5;
+      cursor: pointer;
+      padding: 0.5rem;
+      border-radius: 50%;
+      transition: all 0.2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 2.5rem;
+      height: 2.5rem;
+
+      &:hover {
+        background: var(--surface-200);
+        color: var(--text-primary);
+        transform: scale(1.05);
+      }
+
+      &:active {
+        transform: scale(0.95);
+      }
+
+      .material-icons {
+        font-size: 1.25rem;
+      }
     }
   }
 
@@ -208,6 +248,38 @@
         }
       }
 
+      .cancel-btn {
+        padding: 12px 24px;
+        background: transparent;
+        color: var(--text-secondary);
+        border: 2px solid var(--surface-300);
+        border-radius: 8px;
+        font-size: 0.95rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        min-width: 140px;
+
+        &:hover:not(:disabled) {
+          background: var(--surface-100);
+          border-color: var(--surface-400);
+          color: var(--text-primary);
+        }
+
+        &:disabled {
+          opacity: 0.6;
+          cursor: not-allowed;
+        }
+
+        .material-icons {
+          font-size: 18px;
+        }
+      }
+
       .secondary-btn {
         padding: 12px 24px;
         background: transparent;
@@ -304,13 +376,24 @@
   .user-profile-container {
     padding: 1rem;
   }
-
   .profile-form-container {
     .form-header {
       margin-bottom: 2rem;
+      padding-right: 3rem; // Make room for close button
 
-      h2 {
-        font-size: 1.5rem;
+      .header-content {
+        h2 {
+          font-size: 1.5rem;
+        }
+      }
+
+      .close-btn {
+        width: 2.25rem;
+        height: 2.25rem;
+        
+        .material-icons {
+          font-size: 1.125rem;
+        }
       }
     }
 
@@ -323,8 +406,59 @@
 // When used in a dialog
 :host-context(.mat-mdc-dialog-container) {
   .user-profile-container {
-    padding: 0;
+    padding: 1.5rem;
     max-width: none;
+    max-height: calc(90vh - 4rem);
+    overflow-y: auto;
+    margin: 0;
+  }
+
+  .profile-form-container {
+    max-height: none;
+    
+    .form-header {
+      margin-bottom: 1.5rem !important;
+      
+      h2 {
+        font-size: 1.5rem !important;
+      }
+    }
+  }
+
+  .auth-form {
+    max-height: none;
+    
+    .form-section {
+      margin-bottom: 1.5rem !important;
+      
+      .section-header {
+        margin-bottom: 1rem !important;
+        
+        h3 {
+          font-size: 1.125rem !important;
+        }
+      }
+    }
+    
+    .form-actions {
+      margin-top: 1.5rem !important;
+      padding-top: 1.5rem !important;
+      border-top: 1px solid var(--surface-300);
+      position: sticky;
+      bottom: 0;
+      background: var(--surface-0);
+      z-index: 1;
+    }
+  }
+}
+
+// Dark theme dialog adjustments
+:host-context(.dark-theme) {
+  :host-context(.mat-mdc-dialog-container) {
+    .auth-form .form-actions {
+      border-top-color: var(--surface-300);
+      background: var(--surface-0);
+    }
   }
 }
 

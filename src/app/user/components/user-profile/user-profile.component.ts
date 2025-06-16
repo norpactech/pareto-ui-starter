@@ -145,15 +145,18 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     });
   }  onSave(): void {
     if (this.profileForm.valid) {
-      this.isSaving = true;
-      
-      if (this.currentUser) {
-        // Update existing user
+      this.isSaving = true;      if (this.currentUser) {        // Update existing user - use original updatedAt for soft locking
         const updateData: UpdateUserRequest = {
           ...this.profileForm.value,
-          id: this.currentUser.id
+          id: this.currentUser.id,
+          email: this.profileForm.get('email')?.value || this.currentUser.email,
+          updatedAt: this.currentUser.updatedAt || this.currentUser.createdAt, // Use original timestamp for soft locking, fallback to createdAt
+          updatedBy: this.currentUser.email
         };
 
+        console.log('Sending update data to API (with original updatedAt for soft locking):', updateData);
+        console.log('Original updatedAt from loaded record:', this.currentUser.updatedAt);
+        console.log('Timestamp being sent for soft locking:', updateData.updatedAt);
         this.userService.persist(updateData)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
@@ -172,9 +175,18 @@ export class UserProfileComponent implements OnInit, OnDestroy {
         // Create new user profile
         const createData = {
           ...this.profileForm.value,
-          email: this.profileForm.get('email')?.value // Ensure email is included
-        };
+          email: this.profileForm.get('email')?.value, // Ensure email is included
+          createdAt: new Date(),
+          updatedAt: new Date()
+        };        // Get the current user email for createdBy/updatedBy
+        this.authService.authState$.pipe(take(1)).subscribe(authState => {
+          if (authState.user?.email) {
+            createData.createdBy = authState.user.email;
+            createData.updatedBy = authState.user.email;
+          }
+        });
 
+        console.log('Sending create data to API:', createData);
         this.userService.persist(createData)
           .pipe(takeUntil(this.destroy$))
           .subscribe({
@@ -193,8 +205,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     } else {
       this.markFormGroupTouched();
     }
-  }
-  private handleSaveSuccess(response: IPersistResponse): void {
+  }  private handleSaveSuccess(response: IPersistResponse): void {
+    this.isSaving = false;
+    
     // Emit event for parent component - pass the current user with updates
     const updatedUser: User = {
       ...this.currentUser,

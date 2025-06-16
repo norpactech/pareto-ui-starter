@@ -146,11 +146,11 @@ export abstract class BaseService<T extends IBaseEntity> {
             throw new Error(JSON.stringify(response.error))
           }
           throw new Error('No response data found')
-        }
-        this.snackBar.open('Record Successfully Saved', 'Close', {
+        }        this.snackBar.open('Record Successfully Saved', 'Close', {
           duration: 3000,
           horizontalPosition: 'center',
           verticalPosition: 'bottom',
+          panelClass: ['success-snackbar']
         })
         return response.data
       })
@@ -190,11 +190,11 @@ export abstract class BaseService<T extends IBaseEntity> {
               throw new Error(JSON.stringify(response.error))
             }
             throw new Error('No response data found')
-          }
-          this.snackBar.open(`Record Successfully Deleted`, 'Close', {
+          }          this.snackBar.open(`Record Successfully Deleted`, 'Close', {
             duration: 3000,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
+            panelClass: ['success-snackbar']
           })
           return response.data
         })
@@ -222,11 +222,11 @@ export abstract class BaseService<T extends IBaseEntity> {
         map((response) => {
           if (!response.data) {
             throw new Error('No response data found')
-          }
-          this.snackBar.open(`Record Successfully ${action}.`, 'Close', {
+          }          this.snackBar.open(`Record Successfully ${action}.`, 'Close', {
             duration: 3000,
             horizontalPosition: 'center',
             verticalPosition: 'bottom',
+            panelClass: ['success-snackbar']
           })
           return response.data
         })

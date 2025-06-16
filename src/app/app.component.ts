@@ -107,12 +107,15 @@ export class AppComponent implements OnInit {
   toggleTheme() {
     this.themeService.toggleTheme();
   }
-
   openUserProfile(): void {
     const dialogRef = this.dialog.open(UserProfileComponent, {
       width: '500px',
       maxWidth: '90vw',
-      disableClose: true
+      maxHeight: '90vh',
+      height: 'auto',
+      disableClose: true,
+      hasBackdrop: true,
+      panelClass: 'profile-dialog'
     });
 
     dialogRef.afterClosed().subscribe(result => {
