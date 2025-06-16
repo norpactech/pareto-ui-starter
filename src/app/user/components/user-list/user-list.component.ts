@@ -9,7 +9,7 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { Subject, takeUntil } from 'rxjs';
 import { UserService } from '../../../shared/services/user.service';
-import { User } from '../../../shared/models/user.models';
+import { User } from '../../../shared/models/user.dto';
 import { UserProfileComponent } from '../user-profile/user-profile.component';
 
 @Component({
@@ -46,16 +46,16 @@ export class UserListComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
   private loadUsers(): void {
     this.isLoading = true;
-    this.userService.getUsers()
+    this.userService.find({})
       .pipe(takeUntil(this.destroy$))
       .subscribe({
-        next: (users) => {
-          this.users = users;
+        next: (result: { data: User[]; total: number }) => {
+          this.users = result.data;
           this.isLoading = false;
-        },        error: (error: unknown) => {
+        },
+        error: (error: unknown) => {
           console.error('Error loading users:', error);
           this.showError('Failed to load users');
           this.isLoading = false;
@@ -78,16 +78,16 @@ export class UserListComponent implements OnInit, OnDestroy {
       }
     });
   }
-
   deleteUser(user: User): void {
     if (confirm(`Are you sure you want to delete ${user.firstName} ${user.lastName}?`)) {
-      this.userService.deleteUser(user.id)
+      this.userService.delete({ id: user.id })
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
             this.loadUsers(); // Refresh the list
             this.showSuccess('User deleted successfully');
-          },          error: (error: unknown) => {
+          },
+          error: (error: unknown) => {
             console.error('Error deleting user:', error);
             const errorMessage = error instanceof Error ? error.message : 'Failed to delete user';
             this.showError(errorMessage);

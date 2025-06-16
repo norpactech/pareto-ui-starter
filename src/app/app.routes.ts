@@ -4,8 +4,6 @@ import { ProfileCompleteGuard } from './auth/guards/profile-complete.guard';
 import { HomeComponent } from './home/home.component';
 import { HelpComponent } from './help/help.component';
 import { DashboardComponent } from './dashboard/dashboard.component';
-import { ProfileComponent } from './profile/profile.component';
-import { CompleteProfileComponent } from './profile/complete-profile.component';
 import { SettingsComponent } from './settings/settings.component';
 
 export const routes: Routes = [
@@ -29,12 +27,13 @@ export const routes: Routes = [
     component: DashboardComponent
   },  {
     path: 'complete-profile',
-    canActivate: [AuthGuard],
-    component: CompleteProfileComponent
-  },  {
+    redirectTo: '/users/profile',
+    pathMatch: 'full'
+  },
+  {
     path: 'profile',
-    canActivate: [AuthGuard, ProfileCompleteGuard],
-    component: ProfileComponent
+    redirectTo: '/users/profile',
+    pathMatch: 'full'
   },
   {
     path: 'settings',

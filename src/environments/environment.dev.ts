@@ -7,8 +7,7 @@ export const environment = {
   production: false,
   development: true,
   environmentName: 'dev',
-  apiUrl: 'https://api-dev.northernpacifictech.com/api',
-  wsUrl: 'wss://api-dev.northernpacifictech.com',
+  apiUrl: 'https://dev.api.paretofactory.com/v01',
   enableLogging: true,
   enableDebugInfo: true,
   logLevel: 'info',  cognito: {

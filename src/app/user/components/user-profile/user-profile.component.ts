@@ -1,4 +1,4 @@
-import { Component, OnInit, OnDestroy, inject } from '@angular/core';
+import { Component, OnInit, OnDestroy, inject, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialogRef, MatDialogModule } from '@angular/material/dialog';
@@ -8,14 +8,17 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
-import { Subject, takeUntil } from 'rxjs';
+import { MatCardModule } from '@angular/material/card';
+import { Router } from '@angular/router';
+import { Subject, takeUntil, take, switchMap } from 'rxjs';
 import { UserService } from '@shared/services';
-import { IUser, UpdateUserRequest } from '@shared/models';
+import { User, UpdateUserRequest } from '@shared/models';
+import { IPersistResponse } from '@shared/services/model';
+import { CognitoAuthService } from '../../../auth/services/cognito-auth.service';
 
 @Component({
   selector: 'app-user-profile',
-  standalone: true,
-  imports: [
+  standalone: true,  imports: [
     CommonModule,
     ReactiveFormsModule,
     MatDialogModule,
@@ -24,7 +27,8 @@ import { IUser, UpdateUserRequest } from '@shared/models';
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
-    MatProgressSpinnerModule
+    MatProgressSpinnerModule,
+    MatCardModule
   ],
   templateUrl: './user-profile.component.html',
   styleUrl: './user-profile.component.scss'
@@ -32,21 +36,30 @@ import { IUser, UpdateUserRequest } from '@shared/models';
 export class UserProfileComponent implements OnInit, OnDestroy {
   private fb = inject(FormBuilder);
   private userService = inject(UserService);
-  private dialogRef = inject(MatDialogRef<UserProfileComponent>);
+  private dialogRef = inject(MatDialogRef<UserProfileComponent>, { optional: true });
   private snackBar = inject(MatSnackBar);
+  private authService = inject(CognitoAuthService);
+  private router = inject(Router);
+
+  @Output() profileSaved = new EventEmitter<User>();
+  @Output() cancelled = new EventEmitter<void>();
 
   profileForm: FormGroup;
   currentUser: User | null = null;
   isLoading = false;
   isSaving = false;
   private destroy$ = new Subject<void>();
-
   constructor() {
     this.profileForm = this.fb.group({
       firstName: ['', [Validators.required, Validators.minLength(2)]],
       lastName: ['', [Validators.required, Validators.minLength(2)]],
       email: ['', [Validators.required, Validators.email]],
-      phoneNumber: ['', [Validators.required, Validators.pattern(/^\+?[\d\s-()]+$/)]]
+      phone: ['', [Validators.required, Validators.pattern(/^\+?[\d\s-()]+$/)]],
+      street1: ['', [Validators.required, Validators.minLength(5)]],
+      street2: [''],
+      city: ['', [Validators.required, Validators.minLength(2)]],
+      state: ['', [Validators.required, Validators.minLength(2)]],
+      zipCode: ['', [Validators.required, Validators.pattern(/^\d{5}(-\d{4})?$/)]]
     });
   }
 
@@ -58,56 +71,135 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     this.destroy$.next();
     this.destroy$.complete();
   }
-
   private loadCurrentUser(): void {
     this.isLoading = true;
-    this.userService.getCurrentUser()
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (user) => {
-          this.currentUser = user;
-          if (user) {
-            this.profileForm.patchValue({
-              firstName: user.firstName,
-              lastName: user.lastName,
-              email: user.email,
-              phoneNumber: user.phoneNumber
-            });
-          }
-          this.isLoading = false;
-        },        error: (error: unknown) => {
-          console.error('Error loading user:', error);
-          this.showError('Failed to load user profile');
-          this.isLoading = false;
+    
+    // Get current user email from auth service
+    this.authService.authState$.pipe(
+      take(1),
+      switchMap(authState => {
+        if (!authState.isAuthenticated || !authState.user?.email) {
+          throw new Error('User not authenticated');
         }
-      });
-  }
-
-  onSave(): void {
-    if (this.profileForm.valid && this.currentUser) {
+        const params = { email: authState.user.email };
+        return this.userService.find(params);
+      })
+    ).subscribe({
+      next: (result) => {
+        const user = result.data && result.data.length > 0 ? result.data[0] : null;
+        this.currentUser = user;
+        if (user) {
+          this.profileForm.patchValue({
+            firstName: user.firstName,
+            lastName: user.lastName,
+            email: user.email,
+            phone: user.phone,
+            street1: user.street1,
+            street2: user.street2,
+            city: user.city,
+            state: user.state,
+            zipCode: user.zipCode
+          });
+          // Email is always disabled (read-only)
+          this.profileForm.get('email')?.disable();
+        } else {
+          // New user - pre-populate email from Cognito
+          this.authService.authState$.pipe(take(1)).subscribe(authState => {
+            if (authState.user?.email) {
+              this.profileForm.patchValue({ email: authState.user.email });
+              this.profileForm.get('email')?.disable();
+            }
+          });
+        }
+        this.isLoading = false;
+      },
+      error: (error: unknown) => {
+        console.error('Error loading user:', error);
+        this.showError('Failed to load user profile');
+        this.isLoading = false;
+      }
+    });
+  }  onSave(): void {
+    if (this.profileForm.valid) {
       this.isSaving = true;
-      const updateData: UpdateUserRequest = this.profileForm.value;
+      
+      if (this.currentUser) {
+        // Update existing user
+        const updateData: UpdateUserRequest = {
+          ...this.profileForm.value,
+          id: this.currentUser.id
+        };
 
-      this.userService.updateCurrentUserProfile(updateData)
-        .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: (updatedUser) => {
-            this.showSuccess('Profile updated successfully');
-            this.dialogRef.close(updatedUser);
-          },          error: (error: unknown) => {
-            console.error('Error updating profile:', error);
-            const errorMessage = error instanceof Error ? error.message : 'Failed to update profile';
-            this.showError(errorMessage);
-            this.isSaving = false;
-          }
-        });
+        this.userService.persist(updateData)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => {
+              this.showSuccess('Profile updated successfully');
+              this.handleSaveSuccess(response);
+            },
+            error: (error: unknown) => {
+              console.error('Error updating profile:', error);
+              const errorMessage = error instanceof Error ? error.message : 'Failed to update profile';
+              this.showError(errorMessage);
+              this.isSaving = false;
+            }
+          });
+      } else {
+        // Create new user profile
+        const createData = {
+          ...this.profileForm.value,
+          email: this.profileForm.get('email')?.value // Ensure email is included
+        };
+
+        this.userService.persist(createData)
+          .pipe(takeUntil(this.destroy$))
+          .subscribe({
+            next: (response) => {
+              this.showSuccess('Profile created successfully');
+              this.handleSaveSuccess(response);
+            },
+            error: (error: unknown) => {
+              console.error('Error creating profile:', error);
+              const errorMessage = error instanceof Error ? error.message : 'Failed to create profile';
+              this.showError(errorMessage);
+              this.isSaving = false;
+            }
+          });
+      }
     } else {
       this.markFormGroupTouched();
     }
   }
+  private handleSaveSuccess(response: IPersistResponse): void {
+    // Emit event for parent component - pass the current user with updates
+    const updatedUser: User = {
+      ...this.currentUser,
+      ...this.profileForm.value,
+      id: response.id || this.currentUser?.id
+    } as User;
+    
+    this.profileSaved.emit(updatedUser);
+    
+    // Close dialog if in dialog mode
+    if (this.dialogRef) {
+      this.dialogRef.close(updatedUser);
+    } else {
+      // If inline mode, redirect to dashboard
+      this.router.navigate(['/dashboard']);
+    }
+  }
 
   onCancel(): void {
-    this.dialogRef.close();
+    // Emit event for parent component
+    this.cancelled.emit();
+    
+    // Close dialog if in dialog mode
+    if (this.dialogRef) {
+      this.dialogRef.close();
+    } else {
+      // If inline mode, redirect back
+      this.router.navigate(['/dashboard']);
+    }
   }
 
   private markFormGroupTouched(): void {
@@ -129,7 +221,6 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       panelClass: ['error-snackbar']
     });
   }
-
   getErrorMessage(fieldName: string): string {
     const control = this.profileForm.get(fieldName);
     if (control?.hasError('required')) {
@@ -137,12 +228,19 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     }
     if (control?.hasError('email')) {
       return 'Please enter a valid email address';
-    }    if (control?.hasError('minlength')) {
+    }
+    if (control?.hasError('minlength')) {
       const minLengthError = control.errors?.['minlength'] as { requiredLength?: number };
       return `${this.getFieldDisplayName(fieldName)} must be at least ${minLengthError?.requiredLength || 2} characters`;
     }
     if (control?.hasError('pattern')) {
-      return 'Please enter a valid phone number';
+      if (fieldName === 'phone') {
+        return 'Please enter a valid phone number';
+      }
+      if (fieldName === 'zipCode') {
+        return 'Please enter a valid ZIP code (e.g., 12345 or 12345-6789)';
+      }
+      return `Please enter a valid ${this.getFieldDisplayName(fieldName).toLowerCase()}`;
     }
     return '';
   }
@@ -152,7 +250,12 @@ export class UserProfileComponent implements OnInit, OnDestroy {
       firstName: 'First name',
       lastName: 'Last name',
       email: 'Email',
-      phoneNumber: 'Phone number'
+      phone: 'Phone number',
+      street1: 'Street address',
+      street2: 'Street address line 2',
+      city: 'City',
+      state: 'State',
+      zipCode: 'ZIP code'
     };
     return displayNames[fieldName] || fieldName;
   }

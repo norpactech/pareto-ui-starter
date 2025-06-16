@@ -1,0 +1,141 @@
+.user-profile-container {
+  padding: 1.5rem;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 2rem;
+  text-align: center;
+
+  p {
+    margin: 0;
+    color: #666;
+  }
+}
+
+.profile-form {
+  .form-header {
+    margin-bottom: 2rem;
+    text-align: center;
+
+    h2 {
+      margin: 0 0 0.5rem 0;
+      color: #333;
+      font-weight: 500;
+      font-size: 1.8rem;
+    }
+
+    p {
+      margin: 0;
+      color: #666;
+      font-size: 1rem;
+    }
+  }
+
+  .form-section {
+    margin-bottom: 2rem;
+    
+    mat-card-header {
+      margin-bottom: 1rem;
+      
+      mat-card-title {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.2rem;
+        font-weight: 500;
+        
+        mat-icon {
+          color: #666;
+          font-size: 1.3rem;
+          width: 1.3rem;
+          height: 1.3rem;
+        }
+      }
+    }
+
+    mat-card-content {
+      padding-top: 0;
+    }
+  }
+
+  .form-row {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 1rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column;
+      gap: 0;
+    }
+  }
+
+  .half-width {
+    flex: 1;
+  }
+
+  .full-width {
+    width: 100%;
+  }
+
+  .city-field {
+    flex: 2;
+  }
+
+  .state-field {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  .zip-field {
+    flex: 1;
+    min-width: 120px;
+  }
+
+  mat-form-field {
+    margin-bottom: 1rem;
+  }
+
+  .form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 1rem;
+    padding-top: 2rem;
+    border-top: 1px solid #e0e0e0;
+    margin-top: 2rem;
+
+    @media (max-width: 768px) {
+      flex-direction: column-reverse;
+      gap: 0.5rem;
+
+      button {
+        width: 100%;
+      }
+    }
+
+    button {
+      min-width: 140px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      
+      mat-progress-spinner {
+        margin-right: 0.5rem;
+      }
+    }
+  }
+}
+
+// When used in a dialog
+:host-context(.mat-mdc-dialog-container) {
+  .user-profile-container {
+    padding: 0;
+    max-width: none;
+  }
+}

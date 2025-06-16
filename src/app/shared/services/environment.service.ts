@@ -26,10 +26,6 @@ export class EnvironmentService {
     return environment.apiUrl;
   }
 
-  get wsUrl(): string {
-    return environment.wsUrl;
-  }
-
   get enableLogging(): boolean {
     return environment.enableLogging;
   }

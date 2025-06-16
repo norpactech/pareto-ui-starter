@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 
 // Angular Material Modules
-import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -12,18 +11,18 @@ import { MatTableModule } from '@angular/material/table';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatCardModule } from '@angular/material/card';
 
 import { UserRoutingModule } from './user-routing.module';
 import { UserListComponent } from './components/user-list/user-list.component';
 import { UserProfileComponent } from './components/user-profile/user-profile.component';
+import { ProfilePageComponent } from './components/profile-page/profile-page.component';
 
-@NgModule({
-  imports: [
+@NgModule({  imports: [
     CommonModule,
     ReactiveFormsModule,
     UserRoutingModule,
     // Angular Material Modules
-    MatButtonModule,
     MatIconModule,
     MatDialogModule,
     MatFormFieldModule,
@@ -32,9 +31,11 @@ import { UserProfileComponent } from './components/user-profile/user-profile.com
     MatProgressSpinnerModule,
     MatSnackBarModule,
     MatTooltipModule,
+    MatCardModule,
     // Import standalone components
     UserListComponent,
-    UserProfileComponent
+    UserProfileComponent,
+    ProfilePageComponent
   ]
 })
 export class UserModule { }

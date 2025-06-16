@@ -22,3 +22,18 @@ export interface IUser {
   updatedBy: string
   isActive: boolean
 }
+
+// Type alias for backward compatibility
+export type User = IUser;
+
+export interface UpdateUserRequest {
+  email: string
+  firstName: string
+  lastName: string
+  phone?: string
+  street1?: string
+  street2?: string
+  city?: string
+  state?: string
+  zipCode?: string
+}
