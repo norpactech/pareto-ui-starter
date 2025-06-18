@@ -26,7 +26,7 @@ export class AuthProviderFactory implements IAuthProviderFactory {
   createProvider(config: AuthProviderConfig): IAuthProvider {
     switch (config.type) {
       case 'cognito':
-        return new CognitoAuthProvider(this.environmentService);
+        return new CognitoAuthProvider();
       
       case 'firebase':
         throw new Error('Firebase auth provider not implemented yet');

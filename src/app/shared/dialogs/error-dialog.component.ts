@@ -2,7 +2,7 @@
  * Copyright (c) 2025 Northern Pacific Technologies, LLC
  * Licensed under the MIT License.
  */
-import { Component, Inject } from '@angular/core'
+import { Component, inject } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button' // Import MatButtonModule
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'
 import { MatDialogModule } from '@angular/material/dialog' // Import MatDialogModule
@@ -33,10 +33,8 @@ import { MatDialogModule } from '@angular/material/dialog' // Import MatDialogMo
   ],
 })
 export class ErrorDialogComponent {
-  constructor(
-    public dialogRef: MatDialogRef<ErrorDialogComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: { message: string }
-  ) {}
+  public dialogRef = inject(MatDialogRef<ErrorDialogComponent>);
+  public data: { message: string } = inject(MAT_DIALOG_DATA);
 
   onClose(): void {
     this.dialogRef.close()
