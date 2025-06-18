@@ -163,6 +163,20 @@ mat-card-subtitle {
   }
 }
 
+// Dark theme support for back button
+:host-context(.dark-theme) .back-btn {
+  color: var(--primary-400); // Lighter primary color for better contrast in dark theme
+  
+  &:hover {
+    background-color: rgba(62, 187, 128, 0.2) !important; // Darker background with primary color tint
+    color: #ffffff !important; // White text for good contrast
+    
+    mat-icon {
+      color: #ffffff !important; // White icon to match text
+    }
+  }
+}
+
 // Responsive design
 @media (max-width: 768px) {
   .help-container {

@@ -313,10 +313,146 @@ html, body {
     background: #404040 !important;
     color: #ffffff !important;
   }
-
   // Ensure icons in list items also get proper contrast
   .mat-list-item:hover .menu-icon,
   .mat-list-item:hover .material-icons {
     color: #ffffff !important;
+  }
+}
+
+// Force all auth forms to use light theme styling only
+// This ensures proper contrast and avoids dark theme issues for authentication
+app-sign-up,
+app-sign-in,
+app-forgot-password,
+app-reset-password,
+app-verify-email,
+.sign-up-container,
+.sign-in-container,
+.forgot-password-container,
+.reset-password-container,
+.verify-email-container,
+.auth-layout {
+  // Force light theme background and text
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  color: rgba(0, 0, 0, 0.87) !important;
+
+  // Ensure the component itself has light background
+  * {
+    background-color: inherit;
+  }
+
+  // Form containers
+  .auth-form,
+  .form-section {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+  }
+
+  // Form labels
+  .form-label,
+  label {
+    color: rgba(0, 0, 0, 0.87) !important;
+  }
+
+  // Form inputs
+  .form-input,
+  input,
+  textarea,
+  select {
+    background: #ffffff !important;
+    background-color: #ffffff !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+    border-color: #e0e0e0 !important;
+
+    &::placeholder {
+      color: rgba(0, 0, 0, 0.38) !important;
+    }
+
+    &:focus {
+      border-color: #3ebb80 !important;
+      color: rgba(0, 0, 0, 0.87) !important;
+    }
+
+    &.error {
+      border-color: #f44336 !important;
+    }
+  }
+
+  // All text elements in auth forms
+  p, span, div, small {
+    color: rgba(0, 0, 0, 0.6) !important;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    color: rgba(0, 0, 0, 0.87) !important;
+  }
+
+  // Icons in auth forms
+  .input-icon,
+  .material-icons {
+    color: rgba(0, 0, 0, 0.6) !important;
+  }
+
+  // Password toggle buttons
+  .password-toggle {
+    color: rgba(0, 0, 0, 0.6) !important;
+    background: transparent !important;
+
+    &:hover {
+      background: #f5f5f5 !important;
+    }
+  }
+
+  // Validation errors
+  .field-error {
+    color: #f44336 !important;
+  }
+
+  // Alert boxes in auth forms
+  .alert {
+    background: #f5f5f5 !important;
+    color: rgba(0, 0, 0, 0.87) !important;
+    border-color: #e0e0e0 !important;
+
+    &.alert-error {
+      background: #ffebee !important;
+      color: #c62828 !important;
+      border-color: #ffcdd2 !important;
+
+      .icon-error {
+        color: #c62828 !important;
+      }
+    }
+  }
+
+  // Buttons in auth forms
+  .auth-btn,
+  button {
+    background: #3ebb80 !important;
+    color: #ffffff !important;
+
+    &:hover {
+      background: #38a574 !important;
+    }
+
+    &:disabled {
+      background: #e0e0e0 !important;
+      color: rgba(0, 0, 0, 0.38) !important;
+    }
+  }
+}
+
+// Also target auth routes specifically
+body.dark-theme {
+  app-sign-up,
+  app-sign-in,
+  app-forgot-password,
+  app-reset-password,
+  app-verify-email {
+    background: #ffffff !important;
+    color: rgba(0, 0, 0, 0.87) !important;
   }
 }
