@@ -31,11 +31,10 @@ import { RouterModule } from '@angular/router';
         </mat-card-header>
         <mat-card-content>
           <p>Application settings coming soon...</p>
-        </mat-card-content>
-        <mat-card-actions>
-          <button mat-button routerLink="/dashboard">
+        </mat-card-content>        <mat-card-actions>
+          <button mat-button routerLink="/">
             <mat-icon>arrow_back</mat-icon>
-            Back to Dashboard
+            Back to Home
           </button>
         </mat-card-actions>
       </mat-card>

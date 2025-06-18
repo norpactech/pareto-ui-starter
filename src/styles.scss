@@ -16,7 +16,9 @@ body {
   margin: 0;
   padding: 0;
   font-family: 'Roboto', 'Helvetica Neue', sans-serif;
-  background-color: var(--background);
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  background-image: none !important;
   color: var(--text-primary);
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }

@@ -57,13 +57,10 @@ export class SignInComponent implements OnInit, OnDestroy {
 
       this.cognitoAuth.signIn(username, password, rememberMe)
         .pipe(takeUntil(this.destroy$))
-        .subscribe({
-          next: () => {
-            // Check for redirect URL
-            const redirectUrl = localStorage.getItem('redirectUrl') || '/dashboard';
-            localStorage.removeItem('redirectUrl');
-            this.router.navigate([redirectUrl]);
-          },          error: (error: unknown) => {
+        .subscribe({          next: () => {
+            // Auth service handles navigation, just log success
+            console.log('Sign-in successful');
+          },error: (error: unknown) => {
             console.error('Sign in failed:', error);
           }
         });

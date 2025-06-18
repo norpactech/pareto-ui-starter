@@ -111,7 +111,9 @@ html, body {
   height: 100%;
   margin: 0;
   font-family: 'Roboto', 'Helvetica Neue', sans-serif;
-  background-color: var(--background);
+  background: var(--background) !important;
+  background-color: var(--background) !important;
+  background-image: none !important;
   color: var(--text-primary);
   transition: background-color 0.3s ease, color 0.3s ease;
 }

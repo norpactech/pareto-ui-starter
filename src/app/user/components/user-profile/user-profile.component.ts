@@ -219,10 +219,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     
     // Close dialog if in dialog mode
     if (this.dialogRef) {
-      this.dialogRef.close(updatedUser);
-    } else {
-      // If inline mode, redirect to dashboard
-      this.router.navigate(['/dashboard']);
+      this.dialogRef.close(updatedUser);    } else {
+      // If inline mode, redirect to home page
+      this.router.navigate(['/']);
     }
   }
 
@@ -232,10 +231,9 @@ export class UserProfileComponent implements OnInit, OnDestroy {
     
     // Close dialog if in dialog mode
     if (this.dialogRef) {
-      this.dialogRef.close();
-    } else {
-      // If inline mode, redirect back
-      this.router.navigate(['/dashboard']);
+      this.dialogRef.close();    } else {
+      // If inline mode, redirect back to home
+      this.router.navigate(['/']);
     }
   }
 

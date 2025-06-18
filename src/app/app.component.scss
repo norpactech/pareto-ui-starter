@@ -418,10 +418,9 @@
 .side-menu {
   position: fixed;
   top: 0;
-  left: 0;
-  width: var(--menu-width);
+  left: 0;  width: var(--menu-width);
   height: 100vh;
-  background: white;
+  background: var(--surface);
   box-shadow: 2px 0 15px rgba(0, 0, 0, 0.1);
   transform: translateX(-100%);
   transition: var(--transition);
@@ -437,7 +436,7 @@
     justify-content: space-between;
     align-items: center;
     padding: 20px;
-    border-bottom: 1px solid #e9ecef;
+    border-bottom: 1px solid var(--surface-200);
     background: var(--primary-color);
     color: white;
 
@@ -469,10 +468,8 @@
   .menu-list {
     list-style: none;
     padding: 0;
-    margin: 0;
-
-    li {
-      border-bottom: 1px solid #f1f3f4;
+    margin: 0;    li {
+      border-bottom: 1px solid var(--surface-200);
 
       &:last-child {
         border-bottom: none;
@@ -503,15 +500,14 @@
           background: var(--accent-color);
           transform: scaleY(0);
           transition: var(--transition);
-        }
-
-        &:hover:before {
+        }        &:hover:before {
           transform: scaleY(1);
         }
       }
     }
   }
 }
+
 // Main content styles
 .main-content {
   margin-top: var(--header-height);
@@ -551,9 +547,8 @@
       line-height: 1.7;
     }
   }
-
   .demo-content {
-    background: white;
+    background: var(--surface);
     padding: 30px;
     border-radius: 12px;
     box-shadow: var(--shadow);
@@ -663,5 +658,59 @@ a:focus {
   to {
     opacity: 1;
     transform: translateX(0);
+  }
+}
+
+// Dark theme menu support
+.dark-theme {
+  .hamburger-btn {
+    &:hover {
+      background-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .hamburger-lines span {
+      background-color: var(--text-primary); // Ensure proper contrast in dark theme
+    }
+  }
+
+  .side-menu {
+    background: var(--surface);
+    border-right: 1px solid var(--surface-300);
+    box-shadow: 2px 0 15px rgba(0, 0, 0, 0.3); // Darker shadow for dark theme
+
+    .menu-header {
+      border-bottom: 1px solid var(--surface-300);
+    }
+
+    .menu-item {
+      color: var(--text-primary);
+
+      &:hover {
+        background: rgba(62, 187, 128, 0.1);
+        border-left-color: var(--primary-500);
+      }
+
+      .menu-icon {
+        color: var(--text-secondary);
+      }
+
+      &.logout {
+        color: var(--text-secondary);
+        border-top: 1px solid var(--surface-300);
+
+        &:hover {
+          background: rgba(244, 67, 54, 0.1);
+          border-left-color: #f44336;
+          
+          .menu-icon {
+            color: #f44336;
+          }
+        }
+      }
+    }
+  }
+
+  .overlay {
+    background-color: rgba(0, 0, 0, 0.7);
   }
 }

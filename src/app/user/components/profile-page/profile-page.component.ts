@@ -379,21 +379,20 @@ export class ProfilePageComponent implements OnInit {
       }
     });
   }
-    onProfileCreated(result: User): void {
+  onProfileCreated(result: User): void {
     console.log('Profile created successfully:', result);
     this.hasProfile = true;
     this.currentUser = result;
-    // Optionally show a success message
+    // Redirect to home page after profile creation
+    this.router.navigate(['/']);
   }
-
   onProfileCancelled(): void {
     console.log('Profile creation cancelled');
-    // Redirect back to a safe page since profile creation is required
-    this.router.navigate(['/dashboard']);
+    // Redirect back to home page
+    this.router.navigate(['/']);
   }
-
   goBack(): void {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/']);
   }
 
   formatPhoneDisplay(phone: string): string {

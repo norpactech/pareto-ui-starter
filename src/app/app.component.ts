@@ -4,7 +4,7 @@
  */
 
 import { Component, OnInit, inject } from '@angular/core';
-import { RouterOutlet, RouterLink } from '@angular/router';
+import { RouterOutlet, RouterLink, Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
@@ -15,6 +15,7 @@ import { CognitoAuthService, CognitoAuthState, CognitoUser } from './auth/servic
 import { UserProfileComponent } from './user/components/user-profile/user-profile.component';
 import { UserService } from './shared/services/user.service';
 import { User } from './shared/models/user.dto';
+import { filter } from 'rxjs/operators';
 
 @Component({
   selector: 'app-root',
@@ -27,6 +28,7 @@ export class AppComponent implements OnInit {
   private cognitoAuth = inject(CognitoAuthService);
   private dialog = inject(MatDialog);
   private userService = inject(UserService);
+  private router = inject(Router);
 
   title = 'Pareto UI Starter';
   isMenuOpen = false;
@@ -53,11 +55,13 @@ export class AppComponent implements OnInit {
 
   get currentUser(): CognitoUser | null {
     return this.authState.user;
-  }ngOnInit(): void {
+  }  ngOnInit(): void {
     // Subscribe to theme changes
     this.themeService.theme$.subscribe(theme => {
       this.isDarkTheme = theme === 'dark';
-    });    // Subscribe to authentication state
+    });
+
+    // Subscribe to authentication state
     this.cognitoAuth.authState$.subscribe(authState => {
       console.log('AppComponent: Auth state changed:', authState);
       this.authState = authState;
@@ -65,11 +69,25 @@ export class AppComponent implements OnInit {
       // Check profile status when authentication state changes
       if (authState.isAuthenticated && authState.user?.email) {
         console.log('AppComponent: User authenticated, checking profile for:', authState.user.email);
-        this.checkUserProfile(authState.user.email);      } else {
+        this.checkUserProfile(authState.user.email);
+      } else {
         console.log('AppComponent: User not authenticated or no email, setting hasProfile = false');
         this.hasProfile = false;
         // Close menu when user is not authenticated
         this.isMenuOpen = false;
+      }
+    });    // Subscribe to route changes to recheck profile after navigation
+    this.router.events.pipe(
+      filter(event => event instanceof NavigationEnd)
+    ).subscribe((event: NavigationEnd) => {
+      // If user is authenticated and navigates to home page, recheck profile
+      if (this.authState.isAuthenticated && this.authState.user?.email && 
+          (event.url === '/' || event.url === '/home')) {
+        console.log('AppComponent: Navigation to home detected, rechecking profile after short delay');
+        // Add a small delay to ensure any profile creation has completed
+        setTimeout(() => {
+          this.checkUserProfile(this.authState.user!.email);
+        }, 500);
       }
     });
   }
@@ -161,12 +179,11 @@ export class AppComponent implements OnInit {
           this.hasProfile = false;
           this.isMenuOpen = false; // Close menu on email mismatch
           return;
-        }
-          console.log('AppComponent: Profile found and verified, setting hasProfile = true');
+        }        console.log('AppComponent: Profile found and verified, setting hasProfile = true');
         this.hasProfile = true;
         
-        // Automatically show the hamburger menu when user is authenticated with profile
-        console.log('AppComponent: Auto-opening menu for authenticated user with profile');
+        // Open the hamburger menu by default when user has a profile
+        console.log('AppComponent: Profile verified, opening hamburger menu by default');
         this.isMenuOpen = true;
       },      error: (error) => {
         console.error('Error checking user profile:', error);

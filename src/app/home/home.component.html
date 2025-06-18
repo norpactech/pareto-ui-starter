@@ -58,17 +58,15 @@
           <mat-icon>person_add</mat-icon>
           <span>Sign Up</span>
         </button>
-      </mat-card-actions>
-
-      <!-- Alternative content for authenticated users -->
+      </mat-card-actions>      <!-- Alternative content for authenticated users -->
       <mat-card-actions class="action-buttons" *ngIf="isAuthenticated$ | async">
-        <button routerLink="/dashboard" class="github-style-btn">
-          <mat-icon>dashboard</mat-icon>
-          <span>Go to Dashboard</span>
-        </button>
-        <button routerLink="/profile" class="github-style-btn">
+        <button routerLink="/users/profile" class="github-style-btn">
           <mat-icon>account_circle</mat-icon>
           <span>My Profile</span>
+        </button>
+        <button routerLink="/users" class="github-style-btn">
+          <mat-icon>manage_accounts</mat-icon>
+          <span>User Management</span>
         </button>
       </mat-card-actions>
     </mat-card>

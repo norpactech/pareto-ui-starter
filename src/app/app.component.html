@@ -62,11 +62,7 @@
         <span class="menu-icon material-icons">home</span>
         <span class="menu-text">Home</span>
       </a>
-        <!-- Authenticated User Menu Items -->
-      <ng-container *ngIf="isAuthenticated">        <a routerLink="/dashboard" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
-          <span class="menu-icon material-icons">dashboard</span>
-          <span class="menu-text">Dashboard</span>
-        </a>        <a routerLink="/users/profile" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
+        <!-- Authenticated User Menu Items -->      <ng-container *ngIf="isAuthenticated">        <a routerLink="/users/profile" class="menu-item mat-list-item" (click)="closeMenuConditionally()">
           <span class="menu-icon material-icons">person</span>
           <span class="menu-text">Profile</span>
         </a>

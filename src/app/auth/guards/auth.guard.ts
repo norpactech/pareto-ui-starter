@@ -87,13 +87,12 @@ export class RoleGuard implements CanActivate {
 export class GuestGuard implements CanActivate {
   private cognitoAuth = inject(CognitoAuthService);
   private router = inject(Router);
-
   canActivate(): Observable<boolean> {
     return this.cognitoAuth.authState$.pipe(
       take(1),
       map(authState => {
         if (authState.isAuthenticated) {
-          this.router.navigate(['/dashboard']);
+          this.router.navigate(['/']);
           return false;
         }
         return true;

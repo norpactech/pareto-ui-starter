@@ -21,6 +21,8 @@ import {
   AuthenticationResultType
 } from '@aws-sdk/client-cognito-identity-provider';
 import { environment } from '../../../environments/environment';
+import { UserService } from '../../shared/services/user.service';
+import { IUser } from '../../shared/models';
 
 export interface CognitoConfig {
   region: string;
@@ -71,8 +73,8 @@ export class CognitoAuthService {
     refreshToken: null
   });
   public authState$ = this.authStateSubject.asObservable();
-
   private router = inject(Router);
+  private userService = inject(UserService);
 
   constructor() {
     this.initializeCognito();
@@ -512,7 +514,8 @@ export class CognitoAuthService {
     );
   }  /**
    * Handle successful authentication
-   */  private handleSuccessfulAuth(username: string, authResult: AuthenticationResultType, rememberMe: boolean): void {
+   */  
+  private handleSuccessfulAuth(username: string, authResult: AuthenticationResultType, rememberMe: boolean): void {
     const accessToken = authResult.AccessToken;
     const idToken = authResult.IdToken;
     const refreshToken = authResult.RefreshToken;
@@ -543,7 +546,8 @@ export class CognitoAuthService {
           if (attr.Name && attr.Value) {
             userAttributes[attr.Name] = attr.Value;
           }
-        });        const user: CognitoUser = {
+        });        
+        const user: CognitoUser = {
           username: userResponse.Username || username,
           email: String(userAttributes['email'] || ''),
           attributes: userAttributes
@@ -559,28 +563,78 @@ export class CognitoAuthService {
           error: null,
           accessToken,
           idToken,
-          refreshToken
-        });
+          refreshToken        });
 
-        // Navigate to dashboard or home
-        this.router.navigate(['/dashboard']);      },
-      error: (error) => {
+        // After successful authentication, check if user has a profile
+        this.checkProfileAndRedirect(user.email);
+      },error: (error: unknown) => {
         console.error('Error getting user information:', error);
         
         // More specific error handling
         let errorMessage = 'Failed to get user information';
-        if (error.name === 'NotAuthorizedException') {
-          errorMessage = 'Authentication token is invalid or expired';
-        } else if (error.name === 'UserNotFoundException') {
-          errorMessage = 'User not found';
-        } else if (error.message) {
-          errorMessage = `Failed to get user information: ${error.message}`;
+        
+        if (error && typeof error === 'object') {
+          const err = error as { name?: string; message?: string };
+          if (err.name === 'NotAuthorizedException') {
+            errorMessage = 'Authentication token is invalid or expired';
+          } else if (err.name === 'UserNotFoundException') {
+            errorMessage = 'User not found';
+          } else if (err.message) {
+            errorMessage = `Failed to get user information: ${err.message}`;
+          }
         }
         
         this.updateAuthState({ 
           loading: false, 
           error: errorMessage 
         });
+      }
+    });
+  }
+  /**
+   * Check if user has a profile and redirect accordingly
+   */
+  private checkProfileAndRedirect(email: string): void {
+    // First check for any stored redirect URL
+    const storedRedirectUrl = localStorage.getItem('redirectUrl');
+    localStorage.removeItem('redirectUrl');
+    
+    // If there's a stored URL that's not profile-related, go there
+    if (storedRedirectUrl && 
+        !storedRedirectUrl.includes('/profile') && 
+        !storedRedirectUrl.includes('/complete-profile') && 
+        !storedRedirectUrl.includes('/users/profile')) {
+      console.log('Auth successful, redirecting to stored URL:', storedRedirectUrl);
+      this.router.navigate([storedRedirectUrl]);
+      return;
+    }    // Otherwise, check for user profile
+    const params = { email: email };
+    
+    this.userService.find(params).subscribe({
+      next: (result: { data: IUser[]; total: number }) => {
+        const userProfile = result.data && result.data.length > 0 ? result.data[0] : null;
+        
+        if (!userProfile) {
+          console.log('No profile found, redirecting to profile creation');
+          this.router.navigate(['/complete-profile']);
+        } else {
+          // Verify email match
+          const authenticatedEmail = email.toLowerCase();
+          const profileEmail = userProfile.email?.toLowerCase();
+          
+          if (authenticatedEmail !== profileEmail) {
+            console.warn('Email mismatch detected, redirecting to profile creation');
+            this.router.navigate(['/complete-profile']);
+          } else {
+            console.log('Profile found and verified, redirecting to home');
+            this.router.navigate(['/']);
+          }
+        }
+      },
+      error: (error) => {
+        console.error('Error checking user profile:', error);
+        // On error, default to home page
+        this.router.navigate(['/']);
       }
     });
   }
