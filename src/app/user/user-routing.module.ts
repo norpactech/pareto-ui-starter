@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
+ * Licensed under the MIT License.
+ */
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { UserListComponent } from './components/user-list/user-list.component';

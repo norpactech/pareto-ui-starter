@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
+ * Licensed under the MIT License.
+ */
 import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { AuthLayoutComponent } from './components/auth-layout/auth-layout.component';

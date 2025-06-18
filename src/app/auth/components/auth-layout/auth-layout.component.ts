@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
+ * Licensed under the MIT License.
+ */
 import { Component, inject } from '@angular/core';
 import { RouterOutlet, Router } from '@angular/router';
 

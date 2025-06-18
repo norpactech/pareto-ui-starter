@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
+ * Licensed under the MIT License.
+ */
 import { Injectable, inject } from '@angular/core';
 import { 
   IAuthProvider, 
@@ -57,8 +61,7 @@ export class AuthService {
     // Initialize with default provider (Cognito for now)
     const config: AuthProviderConfig = {
       type: 'cognito',
-      config: this.environmentService.cognito,
-      enabled: true,
+      config: this.environmentService.cognito,      enabled: true,
       primary: true
     };
     

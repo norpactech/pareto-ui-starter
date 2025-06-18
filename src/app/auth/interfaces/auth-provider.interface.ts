@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
+ * Licensed under the MIT License.
+ */
 import { Observable } from 'rxjs';
 
 // Core authentication state interface
@@ -176,12 +180,12 @@ export class AuthError extends Error {
 
 // Provider factory interface for creating provider instances
 export interface IAuthProviderFactory {
-  createProvider(config: Record<string, unknown>): IAuthProvider;
+  createProvider(config: AuthProviderConfig): IAuthProvider;
   getSupportedProviders(): string[];
 }
 
 // Provider configuration interface
-export interface AuthProviderConfig {
+export interface AuthProviderConfig extends Record<string, unknown> {
   type: 'cognito' | 'firebase' | 'auth0' | 'okta' | 'custom';
   config: Record<string, unknown>; // Provider-specific configuration
   enabled: boolean;

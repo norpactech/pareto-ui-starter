@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
+ * Licensed under the MIT License.
+ */
 import { Component, OnInit, OnDestroy, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
@@ -69,6 +73,12 @@ export class SignInComponent implements OnInit, OnDestroy {
     }
   }
 
+  private markFormGroupTouched(): void {
+    Object.keys(this.signInForm.controls).forEach(key => {
+      this.signInForm.get(key)?.markAsTouched();
+    });
+  }
+
   togglePasswordVisibility(): void {
     this.hidePassword = !this.hidePassword;
   }
@@ -88,21 +98,11 @@ export class SignInComponent implements OnInit, OnDestroy {
     }
     return '';
   }
-
   private getFieldDisplayName(fieldName: string): string {
     const displayNames: Record<string, string> = {
       email: 'Email',
       password: 'Password'
     };
     return displayNames[fieldName] || fieldName;
-  }
-
-  private markFormGroupTouched(): void {
-    Object.keys(this.signInForm.controls).forEach(key => {
-      const control = this.signInForm.get(key);
-      if (control) {
-        control.markAsTouched();
-      }
-    });
   }
 }

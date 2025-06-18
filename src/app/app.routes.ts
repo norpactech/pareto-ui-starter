@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
+ * Licensed under the MIT License.
+ */
 import { Routes } from '@angular/router';
 import { AuthGuard } from './auth/guards/auth.guard';
 import { ProfileCompleteGuard } from './auth/guards/profile-complete.guard';

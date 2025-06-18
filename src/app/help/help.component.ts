@@ -1,5 +1,5 @@
 /**
- * Copyright (c) 2025 Northern Pacific Tech., LLC
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
  * Licensed under the MIT License.
  */
 

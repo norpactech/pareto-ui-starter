@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
+ * Licensed under the MIT License.
+ */
+
 import { Injectable, inject } from '@angular/core'
 import { RefTablesService, RefTableTypeService } from '@shared/services'
 import { Observable, throwError } from 'rxjs'

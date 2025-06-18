@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
+ * Licensed under the MIT License.
+ */
 import { Component, Inject } from '@angular/core'
 import { MatButtonModule } from '@angular/material/button' // Import MatButtonModule
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog'

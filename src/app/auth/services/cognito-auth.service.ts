@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
+ * Licensed under the MIT License.
+ */
+
 import { Injectable, inject } from '@angular/core';
 import { BehaviorSubject, Observable, from, throwError } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';

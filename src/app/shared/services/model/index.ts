@@ -1,3 +1,8 @@
+/**
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
+ * Licensed under the MIT License.
+ */
+
 export * from './api-response.dto'
 export * from './base-entity.dto'
 export * from './deact-react.dto'

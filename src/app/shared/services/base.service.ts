@@ -1,3 +1,7 @@
+/**
+ * Copyright (c) 2025 Northern Pacific Technologies, LLC
+ * Licensed under the MIT License.
+ */
 import { HttpClient } from '@angular/common/http'
 import { inject } from '@angular/core'
 import { MatDialog } from '@angular/material/dialog'
