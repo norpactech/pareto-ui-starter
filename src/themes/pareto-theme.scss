@@ -306,11 +306,17 @@ html, body {
 
 // Dark theme specific adjustments
 .dark-theme {
-  .mat-icon-button:hover {
-    background: var(--surface-200);
+  .mat-icon-button:hover {    background: var(--surface-200);
   }
 
   .mat-list-item:hover {
-    background: var(--surface-200);
+    background: #404040 !important;
+    color: #ffffff !important;
+  }
+
+  // Ensure icons in list items also get proper contrast
+  .mat-list-item:hover .menu-icon,
+  .mat-list-item:hover .material-icons {
+    color: #ffffff !important;
   }
 }

@@ -665,14 +665,13 @@ a:focus {
 .dark-theme {
   .hamburger-btn {
     &:hover {
-      background-color: rgba(255, 255, 255, 0.1);
+      background-color: #ffffff;
     }
 
     .hamburger-lines span {
       background-color: var(--text-primary); // Ensure proper contrast in dark theme
     }
   }
-
   .side-menu {
     background: var(--surface);
     border-right: 1px solid var(--surface-300);
@@ -682,16 +681,21 @@ a:focus {
       border-bottom: 1px solid var(--surface-300);
     }
 
-    .menu-item {
+    .menu-list .menu-item {
       color: var(--text-primary);
 
       &:hover {
-        background: rgba(62, 187, 128, 0.1);
+        background: #404040 !important; // Solid medium grey background with !important to override
         border-left-color: var(--primary-500);
+        color: #ffffff !important; // Ensure white text for good contrast
       }
 
       .menu-icon {
         color: var(--text-secondary);
+      }
+
+      &:hover .menu-icon {
+        color: #ffffff !important; // White icon on hover for consistency
       }
 
       &.logout {
@@ -699,11 +703,11 @@ a:focus {
         border-top: 1px solid var(--surface-300);
 
         &:hover {
-          background: rgba(244, 67, 54, 0.1);
+          background: rgba(244, 67, 54, 0.1) !important;
           border-left-color: #f44336;
           
           .menu-icon {
-            color: #f44336;
+            color: #f44336 !important;
           }
         }
       }
